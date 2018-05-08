@@ -191,39 +191,15 @@ def show_PCAs(pca):
 # In[ ]:
 
 
-class activeShape():
-    
-    def no
-
 
 # In[3]:
 
-
-all_landmarks.shape
 
 
 # In[11]:
 
 
-#main
 
-dir_radiographs = "_Data\Radiographs\*.tif"
-radiographs = load_files(dir_radiographs)
-
-dir_segmentations = "_Data\Segmentations\*.png"
-segmentations = load_files(dir_segmentations)
-
-all_landmarks = load_landmarks()
-show_teeth_points(all_landmarks[0])
-
-all_landmarks_std = total_procrustes_analysis(all_landmarks)
-show_teeth_points(all_landmarks_std[0])
-
-pca = PCA_analysis(all_landmarks_std[:,0], 8)
-show_PCAs(pca)
-
-pca = PCA_analysis(all_landmarks_std[:,1], 8)
-show_PCAs(pca)
 
 
 # In[12]:
@@ -322,24 +298,46 @@ def interpolate2(img, gaps, gap_size):
 
 
 # In[ ]:
+if __name__ == "__main__":
+    #main
+
+    dir_radiographs = "_Data\Radiographs\*.tif"
+    radiographs = load_files(dir_radiographs)
+
+    dir_segmentations = "_Data\Segmentations\*.png"
+    segmentations = load_files(dir_segmentations)
+
+    all_landmarks = load_landmarks()
+    show_teeth_points(all_landmarks[0])
+
+    all_landmarks_std = total_procrustes_analysis(all_landmarks)
+    show_teeth_points(all_landmarks_std[0])
+
+    pca = PCA_analysis(all_landmarks_std[:,0], 8)
+    show_PCAs(pca)
+
+    pca = PCA_analysis(all_landmarks_std[:,1], 8)
+    show_PCAs(pca)
+    #==============================================
+
+    plt.imshow(radiographs[0])
+    plt.show()
+
+    re = radiograph_preprocess(radiographs[0])
+    plt.imshow(re)
+    plt.show()
+
+    ree = radiograph_preprocess2(radiographs[0])
+    plt.imshow(ree)
+    plt.show()
+
+    gap_detection(ree)
+
+    img = radiographs[0]
+    gaps,gap_size, new_img = gap_splits(img, 20, 900, 400)
+    plt.imshow(new_img)
+    plt.show()
 
 
-plt.imshow(radiographs[0])
-plt.show()
-
-re = radiograph_preprocess(radiographs[0])
-plt.imshow(re)
-plt.show()
-
-ree = radiograph_preprocess2(radiographs[0])
-plt.imshow(ree)
-plt.show()
-
-gap_detection(ree)
-
-img = radiographs[0]
-gaps,gap_size, new_img = gap_splits(img, 20, 900, 400)
-plt.imshow(new_img)
-plt.show()
 #interpolate2(img, gaps, gap_size)
 
