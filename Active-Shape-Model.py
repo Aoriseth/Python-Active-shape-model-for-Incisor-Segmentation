@@ -56,6 +56,7 @@ def show(img):
 def procrustes_analysis(landmarks):
     
     mean = np.mean(landmarks,0)
+    landmarks_std = np.empty_like(landmarks)
     
     for i, landmark in enumerate(landmarks):
         
@@ -116,7 +117,7 @@ def show_teeth_points(landmarks):
         plt.yticks(())   
         plt.plot(landmark[:,0], landmark[:,1], 'ro')
      
-    plt.show()
+    plt.show(block=False)
     
 def show_PCA(pca):
     
