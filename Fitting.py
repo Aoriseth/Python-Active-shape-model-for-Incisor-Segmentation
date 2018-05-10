@@ -90,8 +90,7 @@ def drawTeeth(landmarks,backdrop,tooth_size,image_center,tooth_gap,top_bottom_se
 					# print(x)
 					# print(y)
 					cv2.circle(backdrop,(x,y),1,(255,255,255),-1)
-					cv2.imshow("Radiograph",backdrop)
-
+					
 	for j in range(4,8):
 		for i in range(0,40):
 				x = int(landmarks[0][j][i][0]*tooth_size[0]+image_center[0]+tooth_gap*(j-4))
@@ -99,8 +98,7 @@ def drawTeeth(landmarks,backdrop,tooth_size,image_center,tooth_gap,top_bottom_se
 				# print(x)
 				# print(y)
 				cv2.circle(backdrop,(x,y),1,(255,255,255),-1)
-				cv2.imshow("Radiograph",backdrop)
-
+	cv2.imshow("Radiograph",backdrop)
 
 def InitializeASM():
 	dir_radiographs = "_Data\Radiographs\*.tif"
