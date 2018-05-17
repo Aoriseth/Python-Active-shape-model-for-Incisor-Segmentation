@@ -114,7 +114,7 @@ def InitializeASM():
 
 	img = cv2.imread("_Data/Radiographs/02.tif")
 	height, width, channels = img.shape
-	scale = 0.5
+	scale = 0.3
 	size = (int(width*scale),int(height*scale))
 	resized_image = cv2.resize(img, size) 
 	cv2.namedWindow( "Radiograph", cv2.WINDOW_AUTOSIZE )
@@ -159,6 +159,7 @@ def InitializeASM():
    			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
 		elif k == 47:
    			print(output)
+   			np.save("initial_position", output)
 
 
 		
@@ -172,5 +173,4 @@ if __name__ == "__main__":
 	# resized_model = cv2.resize(model,(200,100))
 	# showImages(resized_image,resized_model)
 	InitializeASM()
-	print(output)
 
