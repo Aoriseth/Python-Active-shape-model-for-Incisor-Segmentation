@@ -4,6 +4,20 @@ import numpy as np
 
 output = np.empty((1, 8, 40, 2))
 
+img = cv2.imread("_Data/Radiographs/01.tif")
+height, width, channels = img.shape
+scale = 0.3
+size = (int(width*scale),int(height*scale))
+resized_image = cv2.resize(img, size) 
+cv2.namedWindow( "Radiograph", cv2.WINDOW_AUTOSIZE )
+cv2.imshow("Radiograph",resized_image)
+
+pasted = 0
+tooth_size = (0.212*size[0],0.36*size[1]) # (Width, Height)
+image_center = (size[0]/2,size[1]/2) # (X,Y)
+top_bottom_separation = 0.18*size[1] # space between top and bottom incisors
+tooth_gap = 0.035*size[0] # space between teeth on same row
+
 
 def showImages(image,model):
 	cv2.namedWindow( "Radiograph", cv2.WINDOW_AUTOSIZE )
@@ -47,10 +61,10 @@ def mousePosition(event,x,y,flags,param):
 
 def moveTeeth(event,x,y,flags,param):
 	global pasted
-	tooth_size = param[2] # (Width, Height)
-	image_center =  param[3]# (X,Y)
-	top_bottom_separation = param[5] # space between top and bottom incisors
-	tooth_gap = param[4]
+	global tooth_size
+	global image_center
+	global top_bottom_separation
+	global tooth_gap
 	landmarks = param[1]
 	backdrop = param[0]
 
@@ -67,6 +81,7 @@ def moveTeeth(event,x,y,flags,param):
 			# print (x,y)
 			# cv2.circle(image,(x,y),40,(255,0,0))
 		    drawTeeth(landmarks, image, tooth_size, (x,y), tooth_gap, top_bottom_separation)
+		    image_center = (x,y)
 		    # param = (x,y)
 
 		if event == cv2.EVENT_LBUTTONDBLCLK:
@@ -99,33 +114,21 @@ def drawTeeth(landmarks,backdrop,tooth_size,image_center,tooth_gap,top_bottom_se
 	cv2.imshow("Radiograph",backdrop)
 
 def InitializeASM():
-	dir_radiographs = "_Data\Radiographs\*.tif"
+	dir_radiographs = "_Data\\Radiographs\\*.tif"
 	radiographs = ActiveShapeModel.load_files(dir_radiographs)
-	dir_segmentations = "_Data\Segmentations\*.png"
+	dir_segmentations = "_Data\\Segmentations\\*.png"
 	segmentations = ActiveShapeModel.load_files(dir_segmentations)
 
 	all_landmarks = ActiveShapeModel.load_landmarks()
-	# show_teeth_points(all_landmarks[0])
 	all_landmarks_std = ActiveShapeModel.total_procrustes_analysis(all_landmarks)
-	# show_teeth_points(all_landmarks_std[0])
-	# pca = PCA_analysis(all_landmarks_std[0], 8)
+	global pasted
+	global tooth_size
+	global image_center
+	global top_bottom_separation
+	global tooth_gap
 
-	print(all_landmarks_std.shape)
-
-	img = cv2.imread("_Data/Radiographs/02.tif")
-	height, width, channels = img.shape
-	scale = 0.3
-	size = (int(width*scale),int(height*scale))
-	resized_image = cv2.resize(img, size) 
-	cv2.namedWindow( "Radiograph", cv2.WINDOW_AUTOSIZE )
-	cv2.imshow("Radiograph",resized_image)
-
-	pasted = 0
-	tooth_size = (0.212*size[0],0.3*size[1]) # (Width, Height)
-	image_center = (size[0]/2,size[1]/2) # (X,Y)
-	top_bottom_separation = 0.145*size[1] # space between top and bottom incisors
-	tooth_gap = 0.035*size[0] # space between teeth on same row
-	cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+	cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
+	
 	
 	loop=1
 	while loop:
@@ -136,23 +139,23 @@ def InitializeASM():
 		elif k == 2424832:
    			tooth_gap-=5
    			drawTeeth(all_landmarks_std,backdrop,tooth_size,image_center,tooth_gap,top_bottom_separation)
-   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 		elif k == 2555904:
    			tooth_gap+=5
    			drawTeeth(all_landmarks_std,backdrop,tooth_size,image_center,tooth_gap,top_bottom_separation)
-   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 		elif k == 2490368:
    			tooth_size = (tooth_size[0]+10,tooth_size[1]+5)
    			drawTeeth(all_landmarks_std,backdrop,tooth_size,image_center,tooth_gap,top_bottom_separation)
-   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 		elif k == 2621440:
    			tooth_size = (tooth_size[0]-10,tooth_size[1]-5)
    			drawTeeth(all_landmarks_std,backdrop,tooth_size,image_center,tooth_gap,top_bottom_separation)
-   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 		elif k == 2162688:
    			top_bottom_separation += 5
    			drawTeeth(all_landmarks_std,backdrop,tooth_size,image_center,tooth_gap,top_bottom_separation)
-   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+   			cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 		elif k == 2228224:
    			top_bottom_separation -= 5
    			drawTeeth(all_landmarks_std,backdrop,tooth_size,image_center,tooth_gap,top_bottom_separation)
