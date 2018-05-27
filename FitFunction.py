@@ -9,6 +9,41 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+def fit_measure(points, length, edge_img):
+    
+    size = len(points)
+    new_points = np.empty(size,2)
+    total_error = 0
+    
+    for i in range(size):
+        if(i==size-1):
+            p1, p2, p3 = points[i-1], points[i], points[0] 
+        else:
+            p1, p2, p3 = points[i-1], points[i], points[i+1]
+
+        p2_new = strongest_edge_point_on_normal(p1, p2, p3 ,length, edge_img)
+        total_error += error_measure(p2, pnew)
+        new_points[i] = p2_new
+        
+    return total_error;   
+        
+def error_measure(p1, p2):
+    
+    x1, y1 = p1
+    x2, y2 = p2
+    #dist = sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
+    return math.hypot(x2 - x1, y2 - y1)
+    
+         
+def strongest_edge_point_on_normal(a,b,c,length, edge_img):
+    
+    rad = get_normal_angle(a,b,c)
+    points = get_points_on_angle(b, rad, length)
+    edge_strength = edge_strength_at_points(points, edge_img)
+    id_edge_point = np.argmax(edge_strength)
+    edge_point = points[id_edge_point]
+
+    return edge_point
 
 def edge_strength_on_normal(a,b,c,length, edge_img):
     
@@ -115,4 +150,10 @@ if __name__ == "__main__":
     y = np.arange(-20,21)
     plt.plot(y, normalize(edges))
     plt.show()
+
+
+# In[2]:
+
+
+len([[2,2],[1,1]])
 
