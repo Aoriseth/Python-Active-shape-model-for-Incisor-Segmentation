@@ -13,9 +13,11 @@ from skimage.color import rgb2gray
 from skimage.filters import gaussian
 import scipy
 from scipy import ndimage
+import matplotlib
 
 from skimage.util.dtype import dtype_range
 from skimage.util import img_as_ubyte
+from skimage.util import img_as_float
 from skimage.morphology import disk
 from skimage.filters import rank
 from skimage import exposure
