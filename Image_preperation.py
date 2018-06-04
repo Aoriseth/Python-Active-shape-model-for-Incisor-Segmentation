@@ -11,7 +11,6 @@ from scipy import ndimage, signal
 import matplotlib.pyplot as plt
 from skimage.color import rgb2gray
 from skimage.filters import gaussian
-import ActiveShapeModel 
 import scipy
 from scipy import ndimage
 
@@ -23,6 +22,8 @@ from skimage import exposure
 
 from skimage.filters import roberts, sobel, scharr, prewitt
 from skimage import feature
+
+import FileManager
 
 
 def gaussian_filter(sigma, filter_length=None):
@@ -92,11 +93,6 @@ def sharpening2(img):
     return 2*img - smoothed
 
 
-def pre_processing(img):
-    img = ActiveShapeModel.radiograph_preprocess(img)
-    return ActiveShapeModel.radiograph_preprocess2(img)
- 
-
 def contrast_stretching(img):
     # Contrast stretching
     #p2, p98 = np.percentile(img, (0, 20))
@@ -157,8 +153,8 @@ def show(img, size=7):
 
     
 def load_image():
-    dir_radiographs = "_Data\Radiographs\*.tif"
-    radiographs = ActiveShapeModel.load_files(dir_radiographs)
+    #dir_radiographs = "_Data\Radiographs\*.tif"
+    radiographs = FileManager.load_radiographs()
     radiograph = radiographs[0]
     return radiograph
 

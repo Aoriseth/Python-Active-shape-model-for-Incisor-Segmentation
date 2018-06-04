@@ -11,6 +11,17 @@ import matplotlib.pyplot as plt
 from scipy.spatial import procrustes
 import numpy as np
 
+
+def load_radiographs():
+    dir_radiographs = "_Data\Radiographs\*.tif"
+    return load_files(dir_radiographs)
+
+
+def load_segmentations():
+    dir_segmentations = "_Data\Segmentations\*.png"
+    return load_files(dir_segmentations)
+
+
 def load_files(dir_images):
     
     inputList = []
