@@ -1,15 +1,27 @@
 
 # coding: utf-8
 
-# In[3]:
+# In[7]:
 
 
 import os
 import glob
 import cv2
 import matplotlib.pyplot as plt
+from scipy.spatial import procrustes
 import numpy as np
 import math
+
+
+def load_radiographs():
+    dir_radiographs = "_Data\Radiographs\*.tif"
+    return load_files(dir_radiographs)
+
+
+def load_segmentations():
+    dir_segmentations = "_Data\Segmentations\*.png"
+    return load_files(dir_segmentations)
+
 
 def load_files(dir_images):
     
@@ -44,13 +56,49 @@ def load_landmarks():
     inputList = inputList.reshape(14,8, 40, 2)
         
     return inputList
+
+
+def load_landmarks_std():
     
+    all_landmarks = load_landmarks()
+    return total_procrustes_analysis(all_landmarks)
+
+def mean_landmarks(landmarks):
+    return np.mean(landmarks,0)
+    
+def procrustes_analysis(landmarks):
+    
+    mean = np.mean(landmarks,0)
+    landmarks_std = np.empty_like(landmarks)
+    
+    for i, landmark in enumerate(landmarks):
+        
+        mean_std, landmark_std, disp = procrustes(mean, landmark)
+        landmarks_std[i] = landmark_std
+    
+    return landmarks_std
+
+def total_procrustes_analysis(all_landmarks):
+    #allign shapes in their set
+    
+    all_landmarks = np.transpose(all_landmarks, (1,0,2,3))
+    all_landmarks_std = np.empty_like(all_landmarks)
+    
+    for i, landmarks in enumerate(all_landmarks):
+        
+        landmarks_std = procrustes_analysis(landmarks)
+        all_landmarks_std[i] = landmarks_std
+        
+    all_landmarks_std = np.transpose(all_landmarks_std, (1,0,2,3))
+    return all_landmarks_std
+
+    
+######### Visualization #########
+
 def show(img):
 
     plt.imshow(img)
     plt.show()
-    
-######### Visualization #########
     
 def show_tooth_points(landmark, show=True):
     
@@ -64,6 +112,7 @@ def show_teeth_points(landmarks):
     # plt.figure()
     n = len(landmarks)
     hn = int(n/2)
+   
     print('Showing Teeth Landmarks')
 
     f, xplot = plt.subplots(2,hn,figsize=(5, 5))
@@ -80,7 +129,7 @@ def show_teeth_points(landmarks):
     plt.show()
 
 
-# In[4]:
+# In[9]:
 
 
 if __name__ == "__main__":
@@ -94,4 +143,10 @@ if __name__ == "__main__":
 
     all_landmarks = load_landmarks()
     show_teeth_points(all_landmarks[0])
+    
+    all_landmarks_std = total_procrustes_analysis(all_landmarks)
+    show_teeth_points(all_landmarks_std[:,0])
+    
+    all_landmarks_std = load_landmarks_std()
+    show_teeth_points(all_landmarks_std[:,0])
 
