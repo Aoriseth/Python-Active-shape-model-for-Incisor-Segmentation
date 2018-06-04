@@ -121,7 +121,7 @@ def show_with_points(img, points):
     plt.show()
 
 
-# In[8]:
+# In[ ]:
 
 
 if __name__ == "__main__":
@@ -155,5 +155,5 @@ if __name__ == "__main__":
 # In[2]:
 
 
-len([[2,2],[1,1]])
+
 
