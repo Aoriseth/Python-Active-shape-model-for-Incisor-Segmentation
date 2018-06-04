@@ -17,7 +17,7 @@ tooth_size = (0.212*size[0],0.36*size[1]) # (Width, Height)
 image_center = (size[0]/2,size[1]/2) # (X,Y)
 top_bottom_separation = 0.18*size[1] # space between top and bottom incisors
 tooth_gap = 0.035*size[0] # space between teeth on same row
-
+all_landmarks_std = np.empty((1, 8, 40, 2))
 
 def showImages(image,model):
 	cv2.namedWindow( "Radiograph", cv2.WINDOW_AUTOSIZE )
@@ -113,12 +113,12 @@ def drawTeeth(landmarks,backdrop,tooth_size,image_center,tooth_gap,top_bottom_se
 				cv2.circle(backdrop,(x,y),1,(255,255,255),-1)
 	cv2.imshow("Radiograph",backdrop)
 
-def InitializeASM():
-	dir_radiographs = "_Data\\Radiographs\\*.tif"
+def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
+	dir_radiographs = directory
 	radiographs = ActiveShapeModel.load_files(dir_radiographs)
 	dir_segmentations = "_Data\\Segmentations\\*.png"
 	segmentations = ActiveShapeModel.load_files(dir_segmentations)
-
+	global all_landmarks_std
 	all_landmarks = ActiveShapeModel.load_landmarks()
 	all_landmarks_std = ActiveShapeModel.total_procrustes_analysis(all_landmarks)
 	global pasted
@@ -164,8 +164,6 @@ def InitializeASM():
    			print(output)
    			np.save("initial_position", output)
 
-
-		
 	# cv2.setMouseCallback('Radiograph',mousePosition,(resized_image,model))
 	
 if __name__ == "__main__":

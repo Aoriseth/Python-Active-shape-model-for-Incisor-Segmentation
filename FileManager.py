@@ -9,6 +9,7 @@ import glob
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 def load_files(dir_images):
     
@@ -60,18 +61,22 @@ def show_tooth_points(landmark, show=True):
         
 def show_teeth_points(landmarks):
     
-    plt.figure()
+    # plt.figure()
     n = len(landmarks)
     hn = int(n/2)
     print('Showing Teeth Landmarks')
 
-    for i, landmark in enumerate(landmarks):
-        plt.subplot(2, hn, i+1)
-        plt.xticks(())
-        plt.yticks(())   
-        plt.plot(landmark[:,0], landmark[:,1], 'ro')
-        plt.subplots(figsize=(5, 5))
+    f, xplot = plt.subplots(2,hn,figsize=(5, 5))
 
+    for i, landmark in enumerate(landmarks):
+        cursubplot = xplot[math.floor(i/hn),i-4*(math.floor(i/hn))]
+        cursubplot.plot(landmark[:,0], landmark[:,1], 'ro')
+        # plt.subplot(2, hn, i+1)
+        cursubplot.set_xticks(())
+        cursubplot.set_yticks(())
+        # cursubplot.xticks(())
+        # cursubplot.yticks(())   
+        # plt.plot(landmark[:,0], landmark[:,1], 'ro')
     plt.show()
 
 

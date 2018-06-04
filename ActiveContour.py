@@ -119,4 +119,4 @@ def active_contour(points, img, alpha, max_loop):
 
 
 if __name__ == "__main__":
-
+    pass
