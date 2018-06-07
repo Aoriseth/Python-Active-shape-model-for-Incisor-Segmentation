@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[144]:
+# In[11]:
 
 
 import cv2
@@ -23,7 +23,7 @@ from skimage import exposure
 from skimage.filters import roberts, sobel, scharr, prewitt
 from skimage import feature
 
-import FileManager
+import FileManager as fm
 
 
 def gaussian_filter(sigma, filter_length=None):
@@ -146,20 +146,31 @@ def calc_external_img2(img):
     return -G
 
 
+def pre_processing(img):
+    img = radiograph_preprocess(img)
+    return radiograph_preprocess2(img)
+ 
+def radiograph_preprocess(img):
+    
+    equ = cv2.equalizeHist(img)
+    return equ
+
+def radiograph_preprocess2(img):
+    
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    cl1 = clahe.apply(img)
+    return cl1
+
+
+# In[8]:
+
+
+######### Visualization #########
+
 def show(img, size=7):
     fig, ax = plt.subplots(figsize=(size, size))
     plt.imshow(img, cmap=plt.cm.gray)
     plt.show()
-
-    
-def load_image():
-    #dir_radiographs = "_Data\Radiographs\*.tif"
-    radiographs = FileManager.load_radiographs()
-    radiograph = radiographs[0]
-    return radiograph
-
-
-# In[145]:
 
 
 def plot_img_and_hist(image, axes, bins=256):
@@ -271,12 +282,12 @@ def show_diff_edge_detectors(img):
     plt.show()
 
 
-# In[146]:
+# In[9]:
 
 
 if __name__ == "__main__":
     
-    img = load_image()
+    img = fm.load_radiograph()
     piece = img[700:1300,1200:1800]
     show(piece, 7)
     

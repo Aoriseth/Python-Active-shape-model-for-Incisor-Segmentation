@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[7]:
+# In[10]:
 
 
 import os
@@ -11,16 +11,33 @@ import matplotlib.pyplot as plt
 from scipy.spatial import procrustes
 import numpy as np
 
-
-def load_radiographs():
+def load_radiograph():
     dir_radiographs = "_Data\Radiographs\*.tif"
-    return load_files(dir_radiographs)
+    radiographs = FileManager.load_files(dir_radiographs)
+    radiograph = radiographs[0]
+    return radiograph
 
+def load_tooth(i):
+    init = np.load("initial_position.npy")
+    return init[0,i,:,:]/0.3
 
-def load_segmentations():
-    dir_segmentations = "_Data\Segmentations\*.png"
-    return load_files(dir_segmentations)
+def load_tooth_of_piece():
+    tooth = load_tooth(4)
+    tooth_of_piece = tooth
+    tooth_of_piece[:,0]=tooth[:,0]-1200
+    tooth_of_piece[:,1]=tooth[:,1]-700
+    return tooth_of_piece
 
+def load_img_piece():
+    img = load_radiograph()
+    return img[700:1300,1200:1800]
+
+def show_with_points(img, points):
+    fig, ax = plt.subplots(figsize=(7, 7))
+    plt.imshow(img)
+    plt.plot(points[:,0], points[:,1], 'ro', markersize=2)
+    plt.show()
+    
 
 def load_files(dir_images):
     
@@ -38,7 +55,7 @@ def load_files(dir_images):
 
 def load_landmarks():
     
-    dir_landmarks = "_Data/Landmarks/original/*.txt"
+    dir_landmarks = "_Data\Landmarks\original\*.txt"
     inputNames = glob.glob(dir_landmarks)
     
     inputList = np.empty([len(inputNames), 40, 2])
@@ -121,6 +138,16 @@ def show_teeth_points(landmarks):
         plt.plot(landmark[:,0], landmark[:,1], 'ro')
      
     plt.show()
+    
+    
+def load_radiographs():
+    dir_radiographs = "_Data\Radiographs\*.tif"
+    return load_files(dir_radiographs)
+
+
+def load_radiographs():
+    dir_segmentations = "_Data\Segmentations\*.png"
+    segmentations = load_files(dir_segmentations)
 
 
 # In[9]:
@@ -129,10 +156,10 @@ def show_teeth_points(landmarks):
 if __name__ == "__main__":
     #main
 
-    dir_radiographs = "_Data/Radiographs/*.tif"
+    dir_radiographs = "_Data\Radiographs\*.tif"
     radiographs = load_files(dir_radiographs)
 
-    dir_segmentations = "_Data/Segmentations/*.png"
+    dir_segmentations = "_Data\Segmentations\*.png"
     segmentations = load_files(dir_segmentations)
 
     all_landmarks = load_landmarks()
