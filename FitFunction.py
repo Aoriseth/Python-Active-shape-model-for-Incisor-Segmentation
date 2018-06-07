@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[102]:
+# In[99]:
 
 
 import Image_preperation as prep
@@ -17,7 +17,7 @@ def fit_measure(points, length, edge_img):
     total_error = 0
     
     for i in range(size):
-        print(i)
+        #print(i)
         if(i==size-1):
             p1, p2, p3 = points[i-1], points[i], points[0] 
         else:
@@ -25,7 +25,7 @@ def fit_measure(points, length, edge_img):
 
         p2_new = strongest_edge_point_on_normal(p1, p2, p3 ,length, edge_img)
         #print(p2_new)
-        #total_error += error_measure(p2, p2_new)
+        total_error += error_measure(p2, p2_new)
         new_points[i] = p2_new
         
     return new_points, total_error;   
@@ -81,7 +81,7 @@ def get_normal_angle(a,b,c):
     
     b_norm = np.add(b, [2,0])
     
-    return calc_angle(b_proj, b, b_norm)
+    return calc_angle(b, b_proj, b_norm)
 
 def project_on(x, a,c):
     n = np.subtract(a, c)
@@ -103,29 +103,22 @@ def calc_angle(a,b,c):
     return angle
 
 
-def get_y_point(x,rad):
-    return int(np.around(math.tan(rad) * x))
+def get_point_at_distance(point, dist, rad):
+    new_point = np.zeros_like(point)
+    y = int(np.around(math.sin(rad) * dist))
+    x = int(np.around(math.cos(rad) * dist))
+    new_point[0] = point[0] + x
+    new_point[1] = point[1] + y
+    return new_point
 
 def get_points_on_angle(point, rad, length):
     
-    if  rad > math.pi/4:
-        switched = True
-        new_rad = math.pi/4 - ( rad - math.pi/4 )
-    else:
-        switched = False
-        new_rad = rad
-    
     points = np.empty((2*length+1, 2))
-    for i, x in enumerate(range(-length, length+1)):
-        
-        y = get_y_point(x, new_rad)
+    points[0] = point
+    for i, x in enumerate(range(1,length+1)):
 
-        if switched:
-            sub_point = [y,x] 
-        else:
-            sub_point = [x,y]
-            
-        points[i] = np.subtract(point, sub_point)
+        points[2*i+1] = get_point_at_distance(point, x, rad)
+        points[2*i+2] = get_point_at_distance(point, -x, rad)
         
     return points
 
@@ -163,7 +156,7 @@ def show_with_points(img, points):
     plt.show()
 
 
-# In[2]:
+# In[148]:
 
 
 if __name__ == "__main__":
@@ -171,90 +164,30 @@ if __name__ == "__main__":
     piece = fm.load_img_piece()
 
     tooth = fm.load_tooth_of_piece()
-    points = tooth[10:13]
+    points = tooth[37:40]
 
     fm.show_with_points(piece, points)
 
     piece = prep.median_filter(piece)
-    edge_img = prep.edge_detection_low(piece)
+    edge_img = prep.edge_detection_high(piece)
     show_with_points(edge_img, points)
     a,b,c = points
-    edges = edge_strength_on_normal(a,b,c,20, edge_img)
+    edges = edge_strength_on_normal(a,b,c,40, edge_img)
 
-    y = np.arange(-20,21)
+    y = np.arange(-40,41)
     plt.plot(y, normalize(edges))
     plt.show()
+    
+    new_point = strongest_edge_point_on_normal(a,b,c,40, edge_img)
+    new_new = np.append(points,new_point)
+    print(new_new.shape)
+    show_with_points(edge_img, new_new.reshape(4,2))
+    
+    new_points, error = fit_measure(tooth, 30, edge_img)
+    fm.show_with_points(piece, new_points)
 
 
-# In[3]:
-
-
-fm.show_with_points(piece, tooth)
-
-
-# In[100]:
-
-
-#show_with_points(edge_img, tooth[20:23])
-get_normal_angle(tooth[20],tooth[21],tooth[22])
-
-
-# In[103]:
-
-
-new_points, error = fit_measure(tooth, 20, edge_img)
-
-
-# In[104]:
-
-
-fm.show_with_points(piece, new_points)
-
-
-# In[65]:
-
-
-a = np.array([[0,0],[0,1],[0,2]])
-get_normal_angle(a[0],a[1],a[2])
-
-
-# In[43]:
-
-
-calc_angle([1. ,0.], [1,0], [3, 0])
-
-
-# In[46]:
-
-
-np.arccos(np.nan)
-
-
-# In[56]:
-
-
-is_vertical([1. ,0.], [1,0], [3, 0])
-
-
-# In[61]:
-
-
-math.radians(90)
-
-
-# In[62]:
-
-
-math.pi/2
-
-
-# In[80]:
-
-
-np.isnan(np.nan)
-
-
-# In[90]:
+# In[150]:
 
 
 

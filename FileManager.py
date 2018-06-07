@@ -166,7 +166,7 @@ def load_radiographs():
 
 def load_segmentations():
     dir_segmentations = "_Data\Segmentations\*.png"
-    segmentations = load_files(dir_segmentations)
+    return load_files(dir_segmentations)
 
 
 # In[9]:
