@@ -175,7 +175,7 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     global tooth_gap
     global size
     global scale
-    popup=1
+    showpopup=1
     cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 
     
@@ -212,11 +212,11 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
         elif k == 46:
             grays = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
-            gaps,gap_size, new_img = ipe.gap_splits(grays, 20, size[1]/2, 400)
+            gaps,gap_size, new_img = ipe.gap_splits(grays, 20, size[1]/2+size[1]/30, 400)
             # cv2.namedWindow("fuck", cv2.WINDOW_AUTOSIZE)
             # cv2.imshow("fuck",new_img)
             # print(gaps[int(len(gaps)/2)])
-            image_center = (size[0]/2-42,gaps[int(len(gaps)/2)]-40)
+            image_center = (size[0]/2-42,gaps[int(len(gaps)/2)]-40) # fixed values, needs changing
             pasted = 1
             drawTeeth(all_landmarks_std, backdrop, tooth_size, image_center, tooth_gap, top_bottom_separation)
             cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
@@ -226,11 +226,11 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             backdrop = resized_image.copy()
             drawTeeth(all_landmarks_std, backdrop, tooth_size, image_center, tooth_gap, top_bottom_separation)
         elif k == 107:
-            if popup == 1:
-                popup = 0
+            if showpopup == 1:
+                showpopup = 0
                 cv2.destroyWindow("Controls")
             else:
-                popup = 1
+                showpopup = 1
                 showControls()
         elif k == 109:
             resetModel()
@@ -252,7 +252,6 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     # cv2.setMouseCallback('Radiograph',mousePosition,(resized_image,model))
     
 if __name__ == "__main__":
-    pasted = False
     # img = cv2.imread("_Data/Radiographs/01.tif")
     # resized_image = cv2.resize(img, (800, 400)) 
     # model = cv2.imread("_Data/Radiographs/02.tif")
