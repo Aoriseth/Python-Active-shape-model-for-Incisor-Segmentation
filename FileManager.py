@@ -136,7 +136,7 @@ def show_teeth_points(landmarks):
         plt.yticks(())   
         plt.plot(landmark[:,0], landmark[:,1], 'ro')
         
-	plt.show()
+    plt.show()
 
 def show_teeth_points2(landmarks):
     
@@ -164,7 +164,7 @@ def load_radiographs():
     return load_files(dir_radiographs)
 
 
-def load_radiographs():
+def load_segmentations():
     dir_segmentations = "_Data\Segmentations\*.png"
     segmentations = load_files(dir_segmentations)
 
