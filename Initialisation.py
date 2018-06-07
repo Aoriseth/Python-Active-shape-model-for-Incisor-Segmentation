@@ -4,19 +4,20 @@ import numpy as np
 import Initial_pose_estimator as ipe
 
 def showControls():
-    popup = np.ones((200,355), np.uint8)
+    popup = np.ones((220,355), np.uint8)
     font = cv2.FONT_HERSHEY_SIMPLEX
     cv2.putText(popup,'Move mouse: Change tooth position',(10,25), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'Double click: Place or grab tooth',(10,40), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'Left+Right arrows: Change tooth gap',(10,70), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'Top+Down arrows: Change tooth size',(10,85), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'Pageup/down: Bottom/top tooth distance',(10,55), font, 0.5,(240,255,255),1,cv2.LINE_AA)
-    cv2.putText(popup,'"/": Save current position to file',(10,100), font, 0.5,(240,255,255),1,cv2.LINE_AA)
-    cv2.putText(popup,'".": Activate automatic initialisation',(10,115), font, 0.5,(240,255,255),1,cv2.LINE_AA)
-    cv2.putText(popup,'",": Change to next radiograph',(10,130), font, 0.5,(240,255,255),1,cv2.LINE_AA)
-    cv2.putText(popup,'"m": Reset model',(10,145), font, 0.5,(240,255,255),1,cv2.LINE_AA)
-    cv2.putText(popup,'"esc": Close program',(10,160), font, 0.5,(240,255,255),1,cv2.LINE_AA)
-    cv2.putText(popup,'"k": Show/hide this popup',(10,175), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    cv2.putText(popup,'" / ": Save current position to file',(10,100), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    cv2.putText(popup,'" . ": Activate automatic initialisation',(10,115), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    cv2.putText(popup,'" \' ": Activate automatic initialisation',(10,130), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    cv2.putText(popup,'" , ": Change to next radiograph',(10,145), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    cv2.putText(popup,'" m ": Reset model',(10,160), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    cv2.putText(popup,'" esc ": Close program',(10,175), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    cv2.putText(popup,'" k ": Show/hide this popup',(10,190), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     saved = cv2.namedWindow( "Controls", cv2.WINDOW_AUTOSIZE )
     cv2.imshow("Controls",popup)
 
@@ -175,6 +176,7 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     global tooth_gap
     global size
     global scale
+    global output
     showpopup=1
     cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 
@@ -222,6 +224,7 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
         elif k == 44:
             changeImage()
+            # resetModel() 
             cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
             backdrop = resized_image.copy()
             drawTeeth(all_landmarks_std, backdrop, tooth_size, image_center, tooth_gap, top_bottom_separation)
@@ -236,6 +239,28 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             resetModel()
             drawTeeth(all_landmarks_std, backdrop, tooth_size, image_center, tooth_gap, top_bottom_separation)
             cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+        elif k == 39:
+            grays = cv2.cvtColor(backdrop, cv2.COLOR_BGR2GRAY)
+            # print(all_landmarks_std.shape)
+            # print(output[0,0,:,:])
+            mask = np.zeros(grays.shape, np.uint8)
+            for i in range(0,8):
+                test = output[0,i,:,:].astype(np.int32)
+                # print(test)
+                # mask2 = np.zeros(backdrop.shape, np.uint8)
+                # poly = np.array([ [50,50], [50,70], [70,70], [70,50] ], np.int32)
+                cv2.fillConvexPoly(mask, test,(255,255,255))
+                # cv2.fillConvexPoly(mask2, test,(255,255,255))
+                # cv2.imshow("Radiograph",mask)
+                
+                
+                # cv2.addWeighted(mask2, 1, backdrop, 1, 0, backdrop)
+                # drawTeeth(all_landmarks_std, backdrop, tooth_size, image_center, tooth_gap, top_bottom_separation)
+                # cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+            segmentation = cv2.bitwise_and(grays, grays, mask=mask)
+            cv2.namedWindow("Segmentation",cv2.WINDOW_AUTOSIZE)
+            cv2.imshow("Segmentation", segmentation)
+            
         elif k == 47:
             # print(output)
             np.save("initial_position", output)
@@ -251,7 +276,7 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
 
     # cv2.setMouseCallback('Radiograph',mousePosition,(resized_image,model))
     
-if __name__ == "__main__":
+if __name__ == "__main__": 
     # img = cv2.imread("_Data/Radiographs/01.tif")
     # resized_image = cv2.resize(img, (800, 400)) 
     # model = cv2.imread("_Data/Radiographs/02.tif")
