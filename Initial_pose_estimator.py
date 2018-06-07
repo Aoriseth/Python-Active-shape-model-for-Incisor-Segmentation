@@ -23,7 +23,7 @@ def gap_valley_img(img, Yest, Sigma):
     
     img_copy = np.copy(img)
     h_proj = h_project(img)
-    maxI = max(h_proj)
+    maxI = np.max(h_proj)
     pIY = np.empty_like(h_proj, dtype= np.float32)
     
     for Y, I in enumerate(h_proj):
@@ -66,6 +66,8 @@ def gap_splits(img, times, Yest, Sigma):
     gaps = np.empty(times+1)
     gap_size = np.empty(times+1)
     new_img = np.empty((img.shape[0],0))
+    # print(new_img.shape)
+    # new_img = img.copy()
     for i, split in enumerate(splits):
         gaps[i], split_img = gap_valley_img(split, Yest, Sigma)
         if i == 0:
@@ -74,8 +76,8 @@ def gap_splits(img, times, Yest, Sigma):
             gap_size[i] = gap_size[i-1] + split_img.shape[0] #laatste gaat niet kloppe
         new_img = np.append(new_img, split_img, axis=1)
         
-    #plt.imshow(new_img)
-    #plt.show(new_img)
+    # plt.imshow(new_img)
+    plt.show(new_img)
     
     return gaps, gap_size, new_img
 
@@ -142,7 +144,9 @@ if __name__ == "__main__":
     gap_detection(radiograph)
 
     img = radiograph
+    # print(img.shape)
     gaps,gap_size, new_img = gap_splits(img, 20, 900, 400)
+    # print(gaps[int(len(gaps)/2)])
     plt.imshow(new_img)
     plt.show()
 
