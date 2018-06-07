@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[10]:
+# In[1]:
 
 
 import os
@@ -12,8 +12,7 @@ from scipy.spatial import procrustes
 import numpy as np
 
 def load_radiograph():
-    dir_radiographs = "_Data\Radiographs\*.tif"
-    radiographs = FileManager.load_files(dir_radiographs)
+    radiographs = load_radiographs()
     radiograph = radiographs[0]
     return radiograph
 
