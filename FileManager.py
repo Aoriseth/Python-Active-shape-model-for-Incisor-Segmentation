@@ -114,11 +114,10 @@ def show_teeth_points(landmarks):
     hn = int(n/2)
    
     print('Showing Teeth Landmarks')
-
     f, xplot = plt.subplots(2,hn,figsize=(5, 5))
 
     for i, landmark in enumerate(landmarks):
-        cursubplot = xplot[math.floor(i/hn),i-4*(math.floor(i/hn))]
+        cursubplot = xplot[math.floor(i/hn),i-hn*(math.floor(i/hn))]
         cursubplot.plot(landmark[:,0], landmark[:,1], 'ro')
         # plt.subplot(2, hn, i+1)
         cursubplot.set_xticks(())
