@@ -188,7 +188,7 @@ def match_model_points(Y, pca):
         
         convergence_iter -= 1
         if(convergence_iter == 0 or best_MSE < 1):
-            print(convergence_iter, best_MSE)
+            #print(convergence_iter, best_MSE)
             break;    
          
         y = transform(Y,pose_param)

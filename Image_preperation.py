@@ -13,11 +13,9 @@ from skimage.color import rgb2gray
 from skimage.filters import gaussian
 import scipy
 from scipy import ndimage
-import matplotlib
 
 from skimage.util.dtype import dtype_range
 from skimage.util import img_as_ubyte
-from skimage.util import img_as_float
 from skimage.morphology import disk
 from skimage.filters import rank
 from skimage import exposure
@@ -26,6 +24,20 @@ from skimage.filters import roberts, sobel, scharr, prewitt
 from skimage import feature
 
 import FileManager as fm
+
+
+def calc_external_img_active_contour(img): 
+
+    img = np.array(img, dtype=np.uint16)
+    kx = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
+    Gx = cv2.filter2D(img,-1,kx)
+    
+    ky = np.array([[-1,-2,-1],[0,0,0],[1,2,1]])
+    Gy = cv2.filter2D(img,-1,ky)
+    
+    G = np.sqrt(Gx**2 + Gy**2)
+    
+    return G
 
 
 def gaussian_filter(sigma, filter_length=None):

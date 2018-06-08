@@ -96,7 +96,8 @@ def unpack(number, back_pointers, angles, points, pixel_width):
     return new_points
 
 #https://courses.engr.illinois.edu/cs447/fa2017/Slides/Lecture07.pdf
-def viterbi(points, img, pixel_width, alpha):
+#viterbi algo
+def active_contour(points, img, pixel_width, alpha):
     size = len(points)
     num_states = (2*pixel_width +1)
     
@@ -137,11 +138,11 @@ def viterbi(points, img, pixel_width, alpha):
     return new_points
 
 
-def active_contour(points, img, max_loop, pixel_width, alpha):
+def active_contour_loop(points, img, max_loop, pixel_width, alpha):
     
     old_points = points
     for i in range(max_loop):
-        new_points = viterbi(old_points, img, pixel_width, alpha)
+        new_points = active_contour(old_points, img, pixel_width, alpha)
         if np.array_equal(new_points, old_points):
             print(i)
             break
@@ -200,58 +201,58 @@ if __name__ == "__main__":
 # In[4]:
 
 
-ext = calc_external_img(piece)
-fm.show(ext)
+    ext = calc_external_img(piece)
+    fm.show(ext)
 
 
-# In[47]:
+    # In[47]:
 
 
-new_tooth = active_contour(tooth, piece, 1, 40, 10)
-fm.show_with_points(ext, new_tooth)
+    new_tooth = active_contour(tooth, piece, 1, 40, 10)
+    fm.show_with_points(ext, new_tooth)
 
 
-# In[3]:
+    # In[3]:
 
 
-new_img, new_points = resolution_scale(piece, tooth, 1/8)
-fm.show_with_points(new_img, new_points)
-new_tooth = active_contour(new_points, new_img, 2, 10, 10)
-fm.show_with_points(new_img, new_points)
+    new_img, new_points = resolution_scale(piece, tooth, 1/8)
+    fm.show_with_points(new_img, new_points)
+    new_tooth = active_contour(new_points, new_img, 2, 10, 10)
+    fm.show_with_points(new_img, new_points)
 
 
-# In[41]:
+    # In[41]:
 
 
-new_ext = calc_external_img(new_img) 
-fm.show_with_points(new_ext, new_tooth)
+    new_ext = calc_external_img(new_img) 
+    fm.show_with_points(new_ext, new_tooth)
 
 
-# In[44]:
+    # In[44]:
 
 
-new_piece, new_tooth = resolution_scale(piece, tooth,1/10)
+    new_piece, new_tooth = resolution_scale(piece, tooth,1/10)
 
-mean = calc_mean(new_tooth)
-ext1 = calc_external_img(new_piece)
-fm.show_with_points(ext1, new_tooth[0:2])
+    mean = calc_mean(new_tooth)
+    ext1 = calc_external_img(new_piece)
+    fm.show_with_points(ext1, new_tooth[0:2])
 
-print(calc_external(new_tooth[0],ext1))
-print(calc_internal(new_tooth[0], new_tooth[1], mean))
-print(calc_energy(new_tooth[0],new_tooth[1],ext1,mean,10))
-
-
-
-# In[45]:
+    print(calc_external(new_tooth[0],ext1))
+    print(calc_internal(new_tooth[0], new_tooth[1], mean))
+    print(calc_energy(new_tooth[0],new_tooth[1],ext1,mean,10))
 
 
-new_piece, new_tooth = piece, tooth 
 
-mean = calc_mean(new_tooth)
-ext = calc_external_img(new_piece)
-fm.show_with_points(ext, new_tooth[0:2])
+    # In[45]:
 
-print(calc_external(new_tooth[0],ext))
-print(calc_internal(new_tooth[0], new_tooth[1], mean))
-print(calc_energy(new_tooth[0],new_tooth[1],ext,mean,10))
+
+    new_piece, new_tooth = piece, tooth 
+
+    mean = calc_mean(new_tooth)
+    ext = calc_external_img(new_piece)
+    fm.show_with_points(ext, new_tooth[0:2])
+
+    print(calc_external(new_tooth[0],ext))
+    print(calc_internal(new_tooth[0], new_tooth[1], mean))
+    print(calc_energy(new_tooth[0],new_tooth[1],ext,mean,10))
 
