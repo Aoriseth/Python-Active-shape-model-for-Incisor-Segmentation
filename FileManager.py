@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 
 import os
@@ -10,6 +10,21 @@ import cv2
 import matplotlib.pyplot as plt
 from scipy.spatial import procrustes
 import numpy as np
+
+def resolution_scale(img, points, scale):
+    new_points = resolution_scale_points(points, scale)
+    new_img = resolution_downscale_img(img, scale)
+    return new_img, new_points
+
+def resolution_scale_points(points, scale): 
+    return np.around(points*scale)
+
+def resolution_downscale_img(img, scale): 
+    x, y = img.shape
+    xn = int(x*scale)
+    yn = int(y*scale)
+
+    return cv2.resize(img, (yn ,xn)) 
 
 def load_radiograph():
     radiographs = load_radiographs()
@@ -135,27 +150,7 @@ def show_teeth_points(landmarks):
         plt.xticks(())
         plt.yticks(())   
         plt.plot(landmark[:,0], landmark[:,1], 'ro')
-        
-    plt.show()
-
-def show_teeth_points2(landmarks):
-    
-    plt.figure()
-    n = len(landmarks)
-    hn = int(n/2)
-   
-    print('Showing Teeth Landmarks')
-    f, xplot = plt.subplots(2,hn,figsize=(5, 5))
-
-    for i, landmark in enumerate(landmarks):
-        cursubplot = xplot[math.floor(i/hn),i-hn*(math.floor(i/hn))]
-        cursubplot.plot(landmark[:,0], landmark[:,1], 'ro')
-        # plt.subplot(2, hn, i+1)
-        cursubplot.set_xticks(())
-        cursubplot.set_yticks(())
-        # cursubplot.xticks(())
-        # cursubplot.yticks(())   
-        # plt.plot(landmark[:,0], landmark[:,1], 'ro')
+     
     plt.show()
     
     

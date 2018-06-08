@@ -64,7 +64,7 @@ def is_vertical(a,b,c):
         return True
     return False
 
-def is_linear(b_proj , b):
+def is_equal(b_proj , b):
     return np.array_equal(b_proj, b)
 
 def get_normal_angle(a,b,c):
@@ -75,8 +75,12 @@ def get_normal_angle(a,b,c):
     
     b_proj = project_on(b, a,c)
     
-    if(is_linear(b_proj , b)):
+    if(is_equal(b_proj , b)):
         c_norm = np.add(c,[2,0])
+        if(is_equal(a,b)):
+            a_corr = np.add(a,[-5,0])
+            a_proj = project_on(a_corr, b ,c)
+            return calc_angle(a_proj,b,c_norm)
         return calc_angle(a,b,c_norm)
     
     b_norm = np.add(b, [2,0])
