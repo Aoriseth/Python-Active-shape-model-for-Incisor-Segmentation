@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[99]:
+# In[7]:
 
 
 import Image_preperation as prep
@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import FileManager as fm
+import cv2
 
 def fit_measure(points, length, edge_img):
     
@@ -126,6 +127,15 @@ def get_points_on_angle(point, rad, length):
         
     return points
 
+def get_points_on_angle_normal(point, rad, length):
+    
+    points = np.empty((2*length+1, 2))
+    for i, x in enumerate(range(-length,length+1)):
+
+        points[i] = get_point_at_distance(point, x, rad)
+        
+    return points
+
 def edge_strength_at_points(points ,edge_img):
     
     gradient = np.empty(len(points))
@@ -137,6 +147,8 @@ def edge_strength_at_points(points ,edge_img):
 def normalize(x):
     return x / np.linalg.norm(x)
 
+def make_line(img_copy, p1,p2):
+     cv2.line(img_copy,(p1[0],p1[1]),(p2[0],p2[1]),(255,0,0),1)
 
 def load_tooth(i):
     init = np.load("initial_position.npy")
@@ -156,43 +168,109 @@ def load_img_piece():
 def show_with_points(img, points):
     fig, ax = plt.subplots(figsize=(7, 7))
     plt.imshow(img)
-    plt.plot(points[:,0], points[:,1], 'ro', markersize=2)
+    plt.plot(points[:,0], points[:,1], 'ro', markersize=4)
+    plt.xticks(())
+    plt.yticks(())
     plt.show()
+    
+def test_normal_on_edge():
+    
+    piece = fm.load_img_piece()
+    new_pice = piece[300:450,100:250]
+
+    tooth = fm.load_tooth_of_piece()
+    points = tooth
+    
+    fm.show_with_points(piece, points)
+    
+    new_points = np.copy(points)
+    new_points[:,0]=points[:,0]-100
+    new_points[:,1]=points[:,1]-300
+    
+    a,b,c = new_points[0:3]
+    rad = get_normal_angle(a,b,c)
+    p1 = get_point_at_distance(b, 20, rad)
+    p2 = get_point_at_distance(b, -20, rad)
+    img_copy = new_pice.copy()
+    p1 = np.array(p1,dtype=int)
+    p2 = np.array(p2,dtype=int)
+    make_line(img_copy, p1,p2)
+    
+    visualize_points = new_points.take([38,39,0,1,2,3],axis=0)
+    proj = project_on(b, a,c)
+    visualize_points = np.append(visualize_points,proj).reshape(-1,2)
+    
+    show_with_points(img_copy,visualize_points)
+    
+    edges = get_points_on_angle_normal(b, rad, 20)
+    edge_img = prep.edge_detection_high(new_pice)
+    strength = edge_strength_at_points(edges ,edge_img)
+    
+    show_with_points(new_pice,edges)
+    
+    fig, ax = plt.subplots(figsize=(7, 7))
+    plt.plot(np.arange(-20,21),strength)
+    plt.show()
+    
 
 
-# In[148]:
+# In[14]:
 
 
 if __name__ == "__main__":
 
     piece = fm.load_img_piece()
+    new_pice = piece[300:450,100:250]
 
     tooth = fm.load_tooth_of_piece()
-    points = tooth[37:40]
-
+    points = tooth
+    
     fm.show_with_points(piece, points)
-
-    piece = prep.median_filter(piece)
-    edge_img = prep.edge_detection_high(piece)
-    show_with_points(edge_img, points)
-    a,b,c = points
-    edges = edge_strength_on_normal(a,b,c,40, edge_img)
-
-    y = np.arange(-40,41)
-    plt.plot(y, normalize(edges))
+    
+    new_points = np.copy(points)
+    new_points[:,0]=points[:,0]-100
+    new_points[:,1]=points[:,1]-300
+    
+    a,b,c = new_points[0:3]
+    rad = get_normal_angle(a,b,c)
+    p1 = get_point_at_distance(b, 20, rad)
+    p2 = get_point_at_distance(b, -20, rad)
+    img_copy = new_pice.copy()
+    p1 = np.array(p1,dtype=int)
+    p2 = np.array(p2,dtype=int)
+    make_line(img_copy, p1,p2)
+    
+    visualize_points = new_points.take([38,39,0,1,2,3],axis=0)
+    proj = project_on(b, a,c)
+    visualize_points = np.append(visualize_points,proj).reshape(-1,2)
+    
+    show_with_points(img_copy,visualize_points)
+    
+    edges = get_points_on_angle_normal(b, rad, 20)
+    edge_img = prep.edge_detection_high(new_pice)
+    strength = edge_strength_at_points(edges ,edge_img)
+    
+    show_with_points(new_pice,edges)
+    
+    fig, ax = plt.subplots(figsize=(7, 7))
+    plt.plot(np.arange(-20,21),strength)
     plt.show()
     
-    new_point = strongest_edge_point_on_normal(a,b,c,40, edge_img)
-    new_new = np.append(points,new_point)
-    print(new_new.shape)
-    show_with_points(edge_img, new_new.reshape(4,2))
+#     piece = prep.median_filter(piece)
+#     edge_img = prep.edge_detection_high(piece)
+#     show_with_points(edge_img, points)
+#     a,b,c = points
+#     edges = edge_strength_on_normal(a,b,c,40, edge_img)
+
+#     y = np.arange(-40,41)
+#     plt.plot(y, normalize(edges))
+#     plt.show()
     
-    new_points, error = fit_measure(tooth, 30, edge_img)
-    fm.show_with_points(piece, new_points)
-
-
-# In[150]:
-
-
-
+#     new_point = strongest_edge_point_on_normal(a,b,c,40, edge_img)
+#     new_new = np.append(points,new_point)
+#     print(new_new.shape)
+#     show_with_points(edge_img, new_new.reshape(4,2))
+    
+#     new_points, error = fit_measure(tooth, 30, edge_img)
+#     fm.show_with_points(piece, new_points)
 

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[6]:
+# In[10]:
 
 
 import cv2
@@ -19,11 +19,11 @@ def position_prob(Y, Yest, Sigma):
     return ( 1 / (np.sqrt(2*np.pi)*Sigma) ) * np.exp(-t)
     
     
-def gap_valley_img(img, Yest, Sigma):
+def gap_valley_img(img, Yest, Sigma, show=True):
     
     img_copy = np.copy(img)
     h_proj = h_project(img)
-    maxI = np.max(h_proj)
+    maxI = max(h_proj)
     pIY = np.empty_like(h_proj, dtype= np.float32)
     
     for Y, I in enumerate(h_proj):
@@ -32,7 +32,8 @@ def gap_valley_img(img, Yest, Sigma):
         pIY[Y] = pI * pY
         
     gap = np.argmax(pIY)
-    cv2.line(img_copy,(0,gap),(img.shape[1],gap),(255,0,0),10)
+    if(show):
+        cv2.line(img_copy,(0,gap),(img.shape[1],gap),(255,0,0),10)
     #plt.imshow(img_copy)
     #plt.show()
     
@@ -66,18 +67,19 @@ def gap_splits(img, times, Yest, Sigma):
     gaps = np.empty(times+1)
     gap_size = np.empty(times+1)
     new_img = np.empty((img.shape[0],0))
-    # print(new_img.shape)
-    # new_img = img.copy()
     for i, split in enumerate(splits):
-        gaps[i], split_img = gap_valley_img(split, Yest, Sigma)
+        if(i<4 or times-i < 5)  :
+            gaps[i], split_img = gap_valley_img(split, Yest, Sigma, False) 
+        else:
+            gaps[i], split_img = gap_valley_img(split, Yest, Sigma)
         if i == 0:
             gap_size[i] = split_img.shape[0] / 2
         else:
             gap_size[i] = gap_size[i-1] + split_img.shape[0] #laatste gaat niet kloppe
         new_img = np.append(new_img, split_img, axis=1)
         
-    # plt.imshow(new_img)
-    plt.show(new_img)
+    #plt.imshow(new_img)
+    #plt.show(new_img)
     
     return gaps, gap_size, new_img
 
@@ -100,10 +102,11 @@ def interpolate2(img, gaps, gap_size):
     
 def gap_detection(img):
     
-    h_proj = np.sum(img, axis=1)
+    h_proj = np.sum(img[:,1250:1750], axis=1)
     y = np.arange(img.shape[0])
-    plt.plot(h_proj, y)
-    plt.show()
+    return h_proj, y
+#     plt.plot(h_proj, y)
+#     plt.show()
     
 
 def split(img, times):
@@ -130,7 +133,7 @@ def active_contour_match(img, init):
     
 
 
-# In[8]:
+# In[11]:
 
 
 if __name__ == "__main__":
@@ -138,16 +141,47 @@ if __name__ == "__main__":
     
     radiographs = FileManager.load_radiographs()
     radiograph = radiographs[0]
-    plt.imshow(radiograph)
-    plt.show()
+#     plt.imshow(radiograph)
+#     plt.show()
 
-    gap_detection(radiograph)
+    h_proj, y = gap_detection(radiograph)
 
     img = radiograph
-    # print(img.shape)
     gaps,gap_size, new_img = gap_splits(img, 20, 900, 400)
-    # print(gaps[int(len(gaps)/2)])
+#     plt.imshow(new_img)
+#     plt.show()
+    
+#     fig = plt.figure()
+
+#     ax1 = plt.subplot2grid((1, 3), (0, 0))
+#     ax2 = plt.subplot2grid((1, 3), (0, 1),colspan=2)
+#     ax1.plot(h_proj, y)
+# #     ax1.xlim(100000, 0)
+# #     ax1.ylim(1596, 0)
+#     ax2.imshow(new_img)
+#     plt.tight_layout()
+
+#     plt.show()
+
+#     fig, ax = plt.subplots(figsize=(18, 5))
+#     plt.subplot(1, 3, 1)
+#     plt.imshow(radiograph)
+#     plt.subplot(1, 2, 1)
+    fig, ax = plt.subplots(figsize=(5, 7))
+    plt.plot(h_proj, y)
+    plt.xlim(100000, 0)
+    plt.ylim(1596, 0)
+    plt.show()
+#     plt.subplot(1, 2, 2)
+    fig, ax = plt.subplots(figsize=(11, 5))
     plt.imshow(new_img)
+#     plt.tight_layout()
+    
     plt.show()
 
+
+# In[19]:
+
+
+radiograph.shape
 
