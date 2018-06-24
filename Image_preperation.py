@@ -7,6 +7,7 @@
 import cv2
 import numpy as np
 import math
+import matplotlib
 from scipy import ndimage, signal
 import matplotlib.pyplot as plt
 from skimage.color import rgb2gray
@@ -16,6 +17,7 @@ from scipy import ndimage
 
 from skimage.util.dtype import dtype_range
 from skimage.util import img_as_ubyte
+from skimage.util import img_as_float
 from skimage.morphology import disk
 from skimage.filters import rank
 from skimage import exposure

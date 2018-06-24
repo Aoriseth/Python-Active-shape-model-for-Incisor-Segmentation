@@ -13,7 +13,7 @@ def showControls():
     cv2.putText(popup,'Pageup/down: Bottom/top tooth distance',(10,55), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'" / ": Save current position to file',(10,100), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'" . ": Activate automatic initialisation',(10,115), font, 0.5,(240,255,255),1,cv2.LINE_AA)
-    cv2.putText(popup,'" \' ": Activate automatic initialisation',(10,130), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    cv2.putText(popup,'" \' ": Do segmentation',(10,130), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'" , ": Change to next radiograph',(10,145), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'" m ": Reset model',(10,160), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'" esc ": Close program',(10,175), font, 0.5,(240,255,255),1,cv2.LINE_AA)
