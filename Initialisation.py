@@ -2,6 +2,7 @@ import cv2
 import FileManager
 import numpy as np
 import Initial_pose_estimator as ipe
+import ActiveShapeModel as asm
 
 def showControls():
     popup = np.ones((220,355), np.uint8)
@@ -18,6 +19,7 @@ def showControls():
     cv2.putText(popup,'" m ": Reset model',(10,160), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'" esc ": Close program',(10,175), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     cv2.putText(popup,'" k ": Show/hide this popup',(10,190), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    cv2.putText(popup,'" o ": ASM iteration',(10,205), font, 0.5,(240,255,255),1,cv2.LINE_AA)
     saved = cv2.namedWindow( "Controls", cv2.WINDOW_AUTOSIZE )
     cv2.imshow("Controls",popup)
 
@@ -260,7 +262,18 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             segmentation = cv2.bitwise_and(grays, grays, mask=mask)
             cv2.namedWindow("Segmentation",cv2.WINDOW_AUTOSIZE)
             cv2.imshow("Segmentation", segmentation)
-            
+        elif k == 111:
+            landmarks = FileManager.load_landmarks_std()
+            grays = cv2.cvtColor(backdrop, cv2.COLOR_BGR2GRAY)
+            tooth_variations = landmarks[:,0]
+            tooth_points = np.empty((40,2))
+            tooth_points = output[0,0,:,:]
+            edge_img, pca_tooth = asm.preperation(grays, tooth_variations)
+            points = asm.active_shape_scale(edge_img, tooth_points, pca_tooth, 5, scale)
+            all_landmarks_std[0,0,:,:] = points
+            drawTeeth(all_landmarks_std, backdrop, tooth_size, image_center, tooth_gap, top_bottom_separation)
+            cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+            print("done")
         elif k == 47:
             # print(output)
             np.save("initial_position", output)

@@ -32,7 +32,7 @@ def active_shape_scale(img, tooth_points, pca_tooth, length, scale):
     
     scaled_img , scaled_tooth_points = scaling(img, tooth_points, 1/scale)
     edge_img = prep.calc_external_img_active_contour(scaled_img)
-    new_points = active_shape(edge_img, scaled_tooth_points, pca_tooth, length)
+    new_points = active_shape(edge_img, scaled_tooth_points, pca_tooth, length,20)
     new_img, new_scaled_points = scaling(scaled_img, new_points, scale)
     
     return new_scaled_points
@@ -44,6 +44,7 @@ def active_shape(edge_img, tooth_points, pca_tooth, length, alfa):
     b, pose_param = match.match_model_points(new_points, pca_tooth)
 
     x = match.generate_model_point(b, pca_tooth)
+    print(match.inv_transform(x.reshape(40,2),pose_param))
     return match.inv_transform(x.reshape(40,2),pose_param)
 
 def active_shape_n_times(edge_img, tooth_points, pca_tooth, length,alfa, n_times):
@@ -113,7 +114,9 @@ if __name__ == "__main__":
     # In[95]:
 
 
-    points = active_shape_n_times(edge_img, tooth, pca_tooth, 5, 10,10)
+    points = active_shape_n_times(edge_img, tooth, pca_tooth, 5, 10,1)
+    print(tooth.shape)
+
 
 
     # In[102]:
