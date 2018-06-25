@@ -31,6 +31,14 @@ import FileManager as fm
 
 def calc_external_img_active_contour(img): 
 
+    median = median(img)
+    contrast = contrast_stretching(median)
+    ext_img = canny(contrast)
+
+    return ext_img
+
+def calc_external_img_active_contour2(img): 
+
     img = np.array(img, dtype=np.uint16)
     kx = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
     Gx = cv2.filter2D(img,-1,kx)
