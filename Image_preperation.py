@@ -31,7 +31,7 @@ import FileManager as fm
 
 def calc_external_img_active_contour(img): 
 
-    median = median(img)
+    median = median_filter(img)
     contrast = contrast_stretching(median)
     ext_img = canny(contrast)
 

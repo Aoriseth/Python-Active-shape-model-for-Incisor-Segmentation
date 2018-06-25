@@ -273,16 +273,17 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             cv2.imshow("Segmentation", segmentation)
         elif k == 111:
             grays = cv2.cvtColor(backdrop, cv2.COLOR_BGR2GRAY)
-            tooth_variations = all_landmarks_std[:,0]
-            print(tooth_variations)
-            # print(output[:,0])
-            tooth_points = np.empty((40,2))
-            tooth_points = output[0,0,:,:]
-            edge_img, pca_tooth = asm.preperation(grays, tooth_variations)
-            points = asm.active_shape(edge_img, tooth_points, pca_tooth, 5,20)
-            # print(all_landmarks_std[0,0,:,:])
-            output[0,0,:,:] = points
-            print(output)
+            for i in range(3,4):
+                tooth_variations = all_landmarks_std[:,i]
+                # print(tooth_variations)
+                # print(output[:,0])
+                tooth_points = np.empty((40,2))
+                tooth_points = output[0,i,:,:]
+                edge_img, pca_tooth = asm.preperation(grays, tooth_variations)
+                points = asm.active_shape(edge_img, tooth_points, pca_tooth, 5,20)
+                # print(all_landmarks_std[0,0,:,:])
+                output[0,i,:,:] = points
+            # print(output)
             drawTeethOutput(output, backdrop)
             print("done")
         elif k == 47:
