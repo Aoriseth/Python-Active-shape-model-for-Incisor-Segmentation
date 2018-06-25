@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[ ]:
 
 
 import Image_preperation as prep
@@ -80,13 +80,8 @@ def get_normal_angle(a,b,c):
     #is linear
     if(is_equal(b_proj , b)):
         
-        c_norm = np.add(c,[2,0])
-        if(is_equal(a,b)):
-            a_corr = np.add(a,[-5,0])
-            a_proj = project_on(a_corr, b ,c)
-            rad = calc_angle(a_proj,b,c_norm)
-        else:
-            rad = calc_angle(a,b,c_norm)
+        b_norm = np.add(b,[2,0])
+        rad = calc_angle(a,b,b_norm)
 
     #not linear
     else:
@@ -251,7 +246,7 @@ def test_normal_on_edge():
     
 
 
-# In[3]:
+# In[ ]:
 
 
 if __name__ == "__main__":
@@ -313,7 +308,7 @@ if __name__ == "__main__":
 #     fm.show_with_points(piece, new_points)
 
 
-    # In[11]:
+# In[11]:
 
 
     math.degrees(rad)
