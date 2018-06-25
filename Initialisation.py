@@ -24,7 +24,7 @@ def showControls():
     cv2.imshow("Controls",popup)
 
 
-output = np.empty((1, 8, 40, 2))
+output = np.empty((1, 8, 40, 2),dtype=np.uint16)
 currentImage = 1
 img = cv2.imread("_Data/Radiographs/%02d.tif" % currentImage)
 height, width, channels = img.shape
@@ -140,6 +140,15 @@ def moveTeeth(event,x,y,flags,param):
             image = backdrop.copy()
             drawTeeth(landmarks, image, tooth_size, (x,y), tooth_gap, top_bottom_separation)
             pasted=True
+def drawTeethOutput(model,backdrop):
+    for j in range(0,4):
+        for i in range(0,40):
+            cv2.circle(backdrop, (model[0][j][i][0],model[0][j][i][1]),1,(255,255,255),-1)
+    for j in range(4,8):
+        for i in range(0,40):
+            cv2.circle(backdrop, (model[0][j][i][0],model[0][j][i][1]),1,(255,255,255),-1)
+    cv2.imshow("Radiograph",backdrop)
+
 
 def drawTeeth(landmarks,backdrop,tooth_size,image_center,tooth_gap,top_bottom_separation):
     for j in range(0,4):
@@ -263,16 +272,18 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             cv2.namedWindow("Segmentation",cv2.WINDOW_AUTOSIZE)
             cv2.imshow("Segmentation", segmentation)
         elif k == 111:
-            landmarks = FileManager.load_landmarks_std()
             grays = cv2.cvtColor(backdrop, cv2.COLOR_BGR2GRAY)
-            tooth_variations = landmarks[:,0]
+            tooth_variations = all_landmarks_std[:,0]
+            print(tooth_variations)
+            # print(output[:,0])
             tooth_points = np.empty((40,2))
             tooth_points = output[0,0,:,:]
             edge_img, pca_tooth = asm.preperation(grays, tooth_variations)
-            points = asm.active_shape_scale(edge_img, tooth_points, pca_tooth, 5, scale)
-            all_landmarks_std[0,0,:,:] = points
-            drawTeeth(all_landmarks_std, backdrop, tooth_size, image_center, tooth_gap, top_bottom_separation)
-            cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std,tooth_size,image_center,tooth_gap,top_bottom_separation))
+            points = asm.active_shape(edge_img, tooth_points, pca_tooth, 5,20)
+            # print(all_landmarks_std[0,0,:,:])
+            output[0,0,:,:] = points
+            print(output)
+            drawTeethOutput(output, backdrop)
             print("done")
         elif k == 47:
             # print(output)
