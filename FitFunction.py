@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[22]:
 
 
 import Image_preperation as prep
@@ -172,7 +172,7 @@ def edge_strength_at_points(points ,edge_img):
     
     gradient = np.empty(len(points))
     for i, p in enumerate(points):
-        gradient[i] = edge_img[int(p[0]),int(p[1])]
+        gradient[i] = edge_img[int(p[1]),int(p[0])]
         
     return gradient
 
@@ -246,7 +246,7 @@ def test_normal_on_edge():
     
 
 
-# In[ ]:
+# In[23]:
 
 
 if __name__ == "__main__":
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     tooth = fm.load_tooth_of_piece()
     points = tooth
     
-    fm.show_with_points(piece, points)
+    #fm.show_with_points(piece, points)
     
     new_points = np.copy(points)
     new_points[:,0]=points[:,0]-100
@@ -268,7 +268,9 @@ if __name__ == "__main__":
     rad = get_normal_angle(a,b,c)
     p1 = get_point_at_distance(b, 20, rad)
     p2 = get_point_at_distance(b, -20, rad)
+    
     img_copy = new_pice.copy()
+    
     p1 = np.array(p1,dtype=int)
     p2 = np.array(p2,dtype=int)
     make_line(img_copy, p1,p2)
@@ -280,7 +282,8 @@ if __name__ == "__main__":
     show_with_points(img_copy,visualize_points)
     
     edges = get_points_on_angle_normal(b, rad, 20)
-    edge_img = prep.sobel(new_pice)
+    #edge_img = prep.sobel(new_pice)
+    edge_img = prep.canny(new_pice)
     strength = edge_strength_at_points(edges ,edge_img)
     
     #show_with_points(new_pice,np.append(edges,visualize_points).reshape(-1,2))
@@ -288,6 +291,9 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(figsize=(7, 7))
     plt.plot(np.arange(-20,21),strength)
     plt.show()
+    
+    p = strongest_edge_point_on_normal(a,b,c,20, edge_img)
+    show_with_points(edge_img,np.append(visualize_points,p).reshape(-1,2))
     
 #     piece = prep.median_filter(piece)
 #     edge_img = prep.edge_detection_high(piece)
@@ -306,32 +312,4 @@ if __name__ == "__main__":
     
 #     new_points, error = fit_measure(tooth, 30, edge_img)
 #     fm.show_with_points(piece, new_points)
-
-
-# In[11]:
-
-
-    math.degrees(rad)
-
-
-    # In[14]:
-
-
-    math.degrees(calc_angle(c,b,a))
-
-
-    # In[4]:
-
-
-    edge_img = prep.calc_external_img_active_contour(new_pice)
-    p = strongest_edge_point_on_normal(a,b,c,20, edge_img)
-    show_with_points(edge_img,np.append(visualize_points,p).reshape(-1,2))
-
-
-    # In[8]:
-
-
-    edge_img = prep.canny(new_pice)
-    p = strongest_edge_point_on_normal(a,b,c,20, edge_img)
-    show_with_points(edge_img,np.append(visualize_points,p).reshape(-1,2))
 

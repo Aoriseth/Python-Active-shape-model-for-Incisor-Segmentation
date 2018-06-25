@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[12]:
 
 
 import numpy as np
@@ -53,14 +53,14 @@ def calc_external_img(img):
     
     G = np.sqrt(Gx**2 + Gy**2)
     
-    return -G
+    return G
     
 def calc_external(p, external_img):
     
     p = p.astype(int)
     max_value = np.abs(np.min(external_img))
     
-    return external_img[p[0],p[1]] / max_value
+    return external_img[p[1],p[0]] / max_value
     
 def calc_energy(p1, p2, external_img, mean_points,alpha):
      
@@ -97,13 +97,14 @@ def unpack(number, back_pointers, angles, points, pixel_width):
 
 #https://courses.engr.illinois.edu/cs447/fa2017/Slides/Lecture07.pdf
 #viterbi algo
-def active_contour(points, img, pixel_width, alpha):
+def active_contour(points, edge_img, pixel_width, alpha):
     size = len(points)
     num_states = (2*pixel_width +1)
     
-    trellis = np.empty((size, num_states), dtype=np.float16)
-    back_pointers = np.empty((size, num_states), dtype=int)
-    external_img = calc_external_img(img)
+    trellis = np.zeros((size, num_states), dtype=np.float16)
+    back_pointers = np.zeros((size, num_states), dtype=int)
+    #external_img = calc_external_img(img)
+    external_img = -edge_img
     mean_points = calc_mean(points)
     
     #init
@@ -187,28 +188,38 @@ def get_angles_of(points):
     
 
 
-# In[2]:
+# In[37]:
 
 
 if __name__ == "__main__":
 
     piece = fm.load_img_piece()
-    tooth = fm.load_tooth_of_piece(4)
-    ext = calc_external_img2(piece) 
+    tooth = fm.load_tooth_of_piece(5)
+    ext = calc_external_img(piece) 
     fm.show_with_points(ext, tooth)
+    img, stooth = fm.resolution_scale(piece, tooth, 1/6)
+    ext = calc_external_img(img) 
+    fm.show_with_points(ext, stooth)
 
 
-# In[4]:
+    # In[36]:
+
+
+    new_tooth = active_contour(stooth, -ext2, 10, 5)
+    fm.show_with_points(ext2, new_tooth)
+
+
+    # In[4]:
 
 
     ext = calc_external_img(piece)
     fm.show(ext)
 
 
-    # In[47]:
+    # In[ ]:
 
 
-    new_tooth = active_contour(tooth, piece, 1, 40, 10)
+    new_tooth = active_contour(tooth, piece, 20, 10)
     fm.show_with_points(ext, new_tooth)
 
 
@@ -217,7 +228,7 @@ if __name__ == "__main__":
 
     new_img, new_points = resolution_scale(piece, tooth, 1/8)
     fm.show_with_points(new_img, new_points)
-    new_tooth = active_contour(new_points, new_img, 2, 10, 10)
+    new_tooth = active_contour_loop(new_points, new_img, 1, 10, 10)
     fm.show_with_points(new_img, new_points)
 
 
@@ -255,4 +266,23 @@ if __name__ == "__main__":
     print(calc_external(new_tooth[0],ext))
     print(calc_internal(new_tooth[0], new_tooth[1], mean))
     print(calc_energy(new_tooth[0],new_tooth[1],ext,mean,10))
+
+
+    # In[8]:
+
+
+    piece = fm.load_img_piece()
+    tooth = fm.load_tooth_of_piece(0)
+    ext = calc_external_img2(piece) 
+    fm.show_with_points(ext, tooth)
+    ext2, stooth = fm.resolution_scale(ext, tooth, 1/6)
+    ext = calc_external_img2(img) 
+    fm.show_with_points(ext2, stooth)
+
+
+    # In[11]:
+
+
+    new_tooth = active_contour(stooth, ext2, 6, 1)
+    fm.show_with_points(ext2, new_tooth)
 
