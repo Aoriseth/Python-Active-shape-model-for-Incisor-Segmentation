@@ -32,7 +32,7 @@ def active_shape_scale(img, tooth_points, pca_tooth, length, scale):
     
     scaled_img , scaled_tooth_points = scaling(img, tooth_points, 1/scale)
     edge_img = prep.calc_external_img_active_contour(scaled_img)
-    new_points = active_shape(edge_img, scaled_tooth_points, pca_tooth, length,20)
+    new_points = active_shape(edge_img, scaled_tooth_points, pca_tooth, length)
     new_img, new_scaled_points = scaling(scaled_img, new_points, scale)
     
     return new_scaled_points
@@ -44,7 +44,6 @@ def active_shape(edge_img, tooth_points, pca_tooth, length, alfa):
     b, pose_param = match.match_model_points(new_points, pca_tooth)
 
     x = match.generate_model_point(b, pca_tooth)
-    print(match.inv_transform(x.reshape(40,2),pose_param))
     return match.inv_transform(x.reshape(40,2),pose_param)
 
 def active_shape_n_times(edge_img, tooth_points, pca_tooth, length,alfa, n_times):
@@ -57,10 +56,22 @@ def active_shape_n_times(edge_img, tooth_points, pca_tooth, length,alfa, n_times
                    
     return points
 
+
+def preperation_all(radiograph, all_landmarks):
+    
+    #median = prep.median_filter(radiograph)
+#     edge_img = prep.edge_detection_low(median)
+
+    edge_img = prep.calc_external_img_active_contour(radiograph)
+    pcas_tooth = PCA.PCA_analysis_all(all_landmarks, None)
+    
+    return edge_img, pcas_tooth
+
 def preperation(radiograph, tooth_variations):
     
-#     median = prep.median_filter(radiograph)
+    #median = prep.median_filter(radiograph)
 #     edge_img = prep.edge_detection_low(median)
+
     edge_img = prep.calc_external_img_active_contour(radiograph)
     pca_tooth = PCA.PCA_analysis(tooth_variations, None)
     
@@ -114,9 +125,7 @@ if __name__ == "__main__":
     # In[95]:
 
 
-    points = active_shape_n_times(edge_img, tooth, pca_tooth, 5, 10,1)
-    print(tooth.shape)
-
+    points = active_shape_n_times(edge_img, tooth, pca_tooth, 5, 10)
 
 
     # In[102]:

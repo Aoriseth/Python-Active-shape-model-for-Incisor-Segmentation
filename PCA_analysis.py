@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[5]:
+# In[16]:
 
 
 import matplotlib.pyplot as plt
@@ -9,6 +9,17 @@ import numpy as np
 from sklearn.decomposition import PCA
 import FileManager
 
+def PCA_analysis_all(data_all, number_of_components = None):
+    
+    size = data_all.shape[1]
+    pca_list = []
+    
+    for i in range(size):
+        data = data_all[:,i]
+        pca = PCA_analysis(data, number_of_components)
+        pca_list.append(pca)
+        
+    return pca_list
 
 def PCA_analysis(data, number_of_components):
     
@@ -51,6 +62,7 @@ def show_PCAs(pca):
     plt.figure()
     n = len(pca.components_)
     hn = int(n/2)
+    fig, ax = plt.subplots(figsize=(15, 7))
    
     print('Showing PCA\'s')
 
@@ -64,13 +76,15 @@ def show_PCAs(pca):
     plt.show()
 
 
-# In[6]:
+# In[17]:
 
 
 if __name__ == "__main__":
     #main
     all_landmarks_std = FileManager.load_landmarks_std()
 
-    pca = PCA_analysis(all_landmarks_std[:,0], None)
-    show_PCAs(pca)
+    pcas = PCA_analysis_all(all_landmarks_std)
+    show_PCAs(pcas[0])
+    
+    
 
