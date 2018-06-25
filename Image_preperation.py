@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[11]:
+# In[2]:
 
 
 import cv2
@@ -9,6 +9,7 @@ import numpy as np
 import math
 from scipy import ndimage, signal
 import matplotlib.pyplot as plt
+import matplotlib
 from skimage.color import rgb2gray
 from skimage.filters import gaussian
 import scipy
@@ -21,7 +22,7 @@ from skimage.filters import rank
 from skimage import exposure
 
 from skimage.filters import roberts, sobel, scharr, prewitt
-from skimage import feature
+from skimage import feature, img_as_float
 
 import FileManager as fm
 
@@ -38,53 +39,6 @@ def calc_external_img_active_contour(img):
     G = np.sqrt(Gx**2 + Gy**2)
     
     return G
-
-
-def gaussian_filter(sigma, filter_length=None):
-    '''
-    Given a sigma, return a 1-D Gaussian filter.
-    @param     sigma:         float, defining the width of the filter
-    @param     filter_length: optional, the length of the filter, has to be odd
-    @return    A 1-D numpy array of odd length, 
-               containing the symmetric, discrete approximation of a Gaussian with sigma
-               Summation of the array-values must be equal to one.
-    '''
-    if filter_length==None:
-        #determine the length of the filter
-        filter_length= math.ceil(sigma*5) 
-        #make the length odd
-        filter_length= 2*(int(filter_length)/2) +1   
-    
-    #make sure sigma is a float
-    sigma=float(sigma)
-    
-    #create the filter
-    result = np.zeros( int(filter_length) )
-    
-    #do your best!
-    result = signal.gaussian(filter_length, std=sigma)
-    result = result / np.sum(result)
-       
-    #return the filter
-    return result
-
-    
-def gaussian_smooth1(img, sigma): 
-    '''
-    Do gaussian smoothing with sigma.
-    Returns the smoothed image.
-    '''
-    result = np.zeros_like(img)
-    
-    #get the filter
-    filter = gaussian_filter(sigma,3)
-        
-    pic = img.reshape(-1)
-    new = np.convolve(pic,filter,'same')
-    result = new.reshape(img.shape)
-    
-    return result
-
 
 def sharpening(img): 
     
@@ -110,11 +64,11 @@ def sharpening2(img):
 def contrast_stretching(img):
     # Contrast stretching
     #p2, p98 = np.percentile(img, (0, 20))
-    return exposure.rescale_intensity(img, in_range=(0.075*255, 0.6*255))
+    return exposure.rescale_intensity(img, in_range=(0.05*255, 0.6*255))
 
 def adaptive_equalization(img):
     # Adaptive Equalization
-    return exposure.equalize_adapthist(img, clip_limit = 0.01, nbins = 50)
+    return exposure.equalize_adapthist(img, clip_limit = 0.05, nbins = 50)
 
 def local_equalization(img, size = 50):
     # Equalization
@@ -128,9 +82,14 @@ def edge_detection_low(img):
     
     return roberts(img)
     
-def edge_detection_high(img):
-    return sobel(img)
+# def edge_detection_high(img):
+#     return sobel(img)
 
+def edge_detection_high(img):
+     return canny(img)
+
+def canny(img):
+    return feature.canny(img, sigma=0.1)
 
 def calc_external_img(img):
     
@@ -176,14 +135,14 @@ def radiograph_preprocess2(img):
     return cl1
 
 
-# In[8]:
+# In[5]:
 
 
 ######### Visualization #########
 
 def show(img, size=7):
     fig, ax = plt.subplots(figsize=(size, size))
-    plt.imshow(img, cmap=plt.cm.gray)
+    plt.imshow(img)
     plt.show()
 
 
@@ -271,22 +230,22 @@ def show_diff_edge_detectors(img):
                              figsize=(10, 7))
     ax = axes.ravel()
 
-    ax[0].imshow(img, cmap=plt.cm.gray)
+    ax[0].imshow(img)
     ax[0].set_title('Input image')
     
-    ax[1].imshow(edge_prewitt, cmap=plt.cm.gray)
+    ax[1].imshow(edge_prewitt)
     ax[1].set_title('Prewitt Edge Detection')
 
-    ax[2].imshow(edge_scharr, cmap=plt.cm.gray)
+    ax[2].imshow(edge_scharr)
     ax[2].set_title('Scharr Edge Detection')
 
-    ax[3].imshow(edge_sobel, cmap=plt.cm.gray)
+    ax[3].imshow(edge_sobel)
     ax[3].set_title('Sobel Edge Detection')
 
-    ax[4].imshow(edge_roberts, cmap=plt.cm.gray)
+    ax[4].imshow(edge_roberts)
     ax[4].set_title('Roberts Edge Detection')
     
-    ax[5].imshow(canny, cmap=plt.cm.gray)
+    ax[5].imshow(canny)
     ax[5].set_title('Canny Edge Detection')
 
     for a in ax:
@@ -294,9 +253,37 @@ def show_diff_edge_detectors(img):
 
     plt.tight_layout()
     plt.show()
+    
+    
+def show_diff_cannies(img):
+    matplotlib.rcParams['font.size'] = 8
+    canny1 = feature.canny(img, sigma=0.01)
+    canny2 = feature.canny(img, sigma=0.05)
+    canny3 = feature.canny(img, sigma=0.1)
+    canny4 = roberts(img)
+    canny5 = sobel(img)
+
+    fig, axes = plt.subplots(nrows=2, ncols=3, sharex=True, sharey=True,
+                             figsize=(10, 7))
+    ax = axes.ravel()
+
+    ax[0].imshow(img)
+    ax[0].set_title('Input image')
+    ax[1].imshow(canny1)
+    ax[2].imshow(canny2)
+    ax[3].imshow(canny3)
+    ax[4].imshow(canny4)
+    ax[5].imshow(canny5)
+
+    for a in ax:
+        a.axis('off')
+
+    plt.tight_layout()
+    plt.show()
+    
 
 
-# In[9]:
+# In[6]:
 
 
 if __name__ == "__main__":
@@ -309,5 +296,42 @@ if __name__ == "__main__":
     contrast = contrast_stretching(median)
     
     show_different_preperations(piece)
+    
     show_diff_edge_detectors(contrast)
+
+
+    # In[27]:
+
+
+    new_img = adaptive_equalization(piece)
+    show(new_img, 7)
+
+    median = median_filter(piece)
+    contrast = contrast_stretching(median)
+    show(contrast, 7)
+
+
+    # In[39]:
+
+
+    show_diff_cannies(contrast)
+
+
+    # In[41]:
+
+
+    show(sobel(contrast))
+
+
+    # In[48]:
+
+
+    contrast = contrast_stretching(piece)
+    show(sobel(contrast))
+
+
+    # In[7]:
+
+
+    show(sobel(piece))
 

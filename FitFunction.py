@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[7]:
+# In[2]:
 
 
 import Image_preperation as prep
@@ -68,7 +68,44 @@ def is_vertical(a,b,c):
 def is_equal(b_proj , b):
     return np.array_equal(b_proj, b)
 
+
 def get_normal_angle(a,b,c):
+    if( is_horizontal(a,b,c) ):
+        return math.pi/2
+    if( is_vertical(a,b,c) ):
+        return 0
+    
+    b_proj = project_on(b, a,c)
+        
+    #is linear
+    if(is_equal(b_proj , b)):
+        
+        c_norm = np.add(c,[2,0])
+        if(is_equal(a,b)):
+            a_corr = np.add(a,[-5,0])
+            a_proj = project_on(a_corr, b ,c)
+            rad = calc_angle(a_proj,b,c_norm)
+        else:
+            rad = calc_angle(a,b,c_norm)
+
+    #not linear
+    else:
+        b_norm = np.add(b, [2,0])
+        rad = calc_angle(b_proj, b, b_norm)
+    
+    #rad given back relative to x-axis
+    if( b_norm[0] > b[0]):
+        if (b_proj[1] > b_norm[1]):
+            return rad
+        else:
+            return -rad
+    else:
+        if( b_proj[1] > b_norm[1]):
+            return -rad
+        else:
+            return rad
+
+def get_normal_angle2(a,b,c):
     if( is_horizontal(a,b,c) ):
         return math.pi/2
     if( is_vertical(a,b,c) ):
@@ -86,7 +123,7 @@ def get_normal_angle(a,b,c):
     
     b_norm = np.add(b, [2,0])
     
-    return calc_angle(b, b_proj, b_norm)
+    return calc_angle(b_proj, b, b_norm)
 
 def project_on(x, a,c):
     n = np.subtract(a, c)
@@ -214,7 +251,7 @@ def test_normal_on_edge():
     
 
 
-# In[14]:
+# In[3]:
 
 
 if __name__ == "__main__":
@@ -232,6 +269,7 @@ if __name__ == "__main__":
     new_points[:,1]=points[:,1]-300
     
     a,b,c = new_points[0:3]
+    
     rad = get_normal_angle(a,b,c)
     p1 = get_point_at_distance(b, 20, rad)
     p2 = get_point_at_distance(b, -20, rad)
@@ -240,17 +278,17 @@ if __name__ == "__main__":
     p2 = np.array(p2,dtype=int)
     make_line(img_copy, p1,p2)
     
-    visualize_points = new_points.take([38,39,0,1,2,3],axis=0)
+    visualize_points = new_points.take([38,39,0,1,2,3,4,5],axis=0)
     proj = project_on(b, a,c)
-    visualize_points = np.append(visualize_points,proj).reshape(-1,2)
+    #new_visualize_points = np.append(visualize_points,proj).reshape(-1,2)
     
     show_with_points(img_copy,visualize_points)
     
     edges = get_points_on_angle_normal(b, rad, 20)
-    edge_img = prep.edge_detection_high(new_pice)
+    edge_img = prep.sobel(new_pice)
     strength = edge_strength_at_points(edges ,edge_img)
     
-    show_with_points(new_pice,edges)
+    #show_with_points(new_pice,np.append(edges,visualize_points).reshape(-1,2))
     
     fig, ax = plt.subplots(figsize=(7, 7))
     plt.plot(np.arange(-20,21),strength)
@@ -273,4 +311,32 @@ if __name__ == "__main__":
     
 #     new_points, error = fit_measure(tooth, 30, edge_img)
 #     fm.show_with_points(piece, new_points)
+
+
+    # In[11]:
+
+
+    math.degrees(rad)
+
+
+    # In[14]:
+
+
+    math.degrees(calc_angle(c,b,a))
+
+
+    # In[4]:
+
+
+    edge_img = prep.calc_external_img_active_contour(new_pice)
+    p = strongest_edge_point_on_normal(a,b,c,20, edge_img)
+    show_with_points(edge_img,np.append(visualize_points,p).reshape(-1,2))
+
+
+    # In[8]:
+
+
+    edge_img = prep.canny(new_pice)
+    p = strongest_edge_point_on_normal(a,b,c,20, edge_img)
+    show_with_points(edge_img,np.append(visualize_points,p).reshape(-1,2))
 

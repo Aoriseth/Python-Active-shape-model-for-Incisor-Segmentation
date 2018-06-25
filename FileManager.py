@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[3]:
 
 
 import os
@@ -10,6 +10,12 @@ import cv2
 import matplotlib.pyplot as plt
 from scipy.spatial import procrustes
 import numpy as np
+import Image_preperation as prep
+
+def pre_pocess(img):
+    median = prep.median_filter(img)
+    contrast = prep.contrast_stretching(median)
+    return contrast
 
 def resolution_scale(img, points, scale):
     new_points = resolution_scale_points(points, scale)
@@ -35,8 +41,8 @@ def load_tooth(i):
     init = np.load("initial_position.npy")
     return init[0,i,:,:]/0.3
 
-def load_tooth_of_piece(i=4):
-    tooth = load_tooth(i)
+def load_tooth_of_piece():
+    tooth = load_tooth(4)
     tooth_of_piece = tooth
     tooth_of_piece[:,0]=tooth[:,0]-1200
     tooth_of_piece[:,1]=tooth[:,1]-700
@@ -44,7 +50,8 @@ def load_tooth_of_piece(i=4):
 
 def load_img_piece():
     img = load_radiograph()
-    return img[700:1300,1200:1800]
+    new_img = pre_pocess(img)
+    return new_img[700:1300,1200:1800]
 
 def show_with_points(img, points):
     fig, ax = plt.subplots(figsize=(7, 7))
@@ -142,13 +149,15 @@ def show_teeth_points(landmarks):
     plt.figure()
     n = len(landmarks)
     hn = int(n/2)
+    fig, ax = plt.subplots(figsize=(15, 7))
    
     print('Showing Teeth Landmarks')
 
     for i, landmark in enumerate(landmarks):
         plt.subplot(2, hn, i+1)
-        plt.xticks(())
-        plt.yticks(())   
+        if(i!=hn):
+            plt.xticks(())
+            plt.yticks(())   
         plt.plot(landmark[:,0], landmark[:,1], 'ro')
      
     plt.show()
@@ -164,7 +173,7 @@ def load_segmentations():
     return load_files(dir_segmentations)
 
 
-# In[9]:
+# In[5]:
 
 
 if __name__ == "__main__":
