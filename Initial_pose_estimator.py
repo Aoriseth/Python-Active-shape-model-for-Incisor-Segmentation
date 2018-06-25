@@ -183,5 +183,5 @@ if __name__ == "__main__":
 # In[19]:
 
 
-radiograph.shape
+# radiograph.shape
 

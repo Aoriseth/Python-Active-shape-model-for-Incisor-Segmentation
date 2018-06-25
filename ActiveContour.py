@@ -13,6 +13,8 @@ import scipy
 import cv2
 from scipy import ndimage
 import Image_preperation as prep
+import FileManager as fm
+import Image_preperation as prep
 
 def calc_internal(p1,p2):
     if (np.array_equal(p1,p2)):
@@ -256,7 +258,7 @@ def resolution_downscale(img, resize):
 if __name__ == "__main__":
 
     dir_radiographs = "_Data\Radiographs\*.tif"
-    radiographs = ActiveShapeModel.load_files(dir_radiographs)
+    radiographs = fm.load_files(dir_radiographs)
     radiograph = radiographs[0]
     init = np.load("initial_position.npy")
     
@@ -264,7 +266,7 @@ if __name__ == "__main__":
     tooth = init[0,4,:,:]/0.3
     #tooth = tooth/down_sample
 
-    radiograph_pre = pre_processing(radiograph)
+    radiograph_pre = prep.pre_processing(radiograph)
     img = resolution_downscale(radiograph_pre,down_sample)
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -276,7 +278,7 @@ if __name__ == "__main__":
 # In[196]:
 
 
-smooth = gaussian_smooth1(radiograph,10)
+smooth = prep.gaussian_smooth1(radiograph,10)
 grad = calc_external_img2(smooth)
 grad2 = calc_external_img2(radiograph)
 fig, ax = plt.subplots(figsize=(15, 15))
@@ -343,7 +345,7 @@ plt.show()
 # In[141]:
 
 
-new_tooth = active_contour(tooth2, gausian(piece,1.5), 2, 2, 25)
+new_tooth = active_contour(tooth2, prep.gaussian(piece,1.5), 2, 2, 25)
 fig, ax = plt.subplots(figsize=(7, 7))
 plt.imshow(piece)
 plt.plot(new_tooth[:,0], new_tooth[:,1], 'ro', markersize=2)
