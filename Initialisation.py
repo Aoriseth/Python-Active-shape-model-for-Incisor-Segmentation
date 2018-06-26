@@ -336,7 +336,7 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
         elif k == 111:
             for i in range(0,8):
                 tooth_points = output[0,i,:,:]
-                points = asm.active_shape(edge_img, tooth_points, pca_teeth[i], 5,5)
+                points = asm.active_shape(edge_img, tooth_points, pca_teeth[i], 20,1)
                 # print(all_landmarks_std[0,0,:,:])
                 output[0,i,:,:] = points
             drawTeethOutput(output, backdrop)
