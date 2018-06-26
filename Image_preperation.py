@@ -311,35 +311,35 @@ if __name__ == "__main__":
 # In[27]:
 
 
-new_img = adaptive_equalization(piece)
-show(new_img, 7)
+    new_img = adaptive_equalization(piece)
+    show(new_img, 7)
 
-median = median_filter(piece)
-contrast = contrast_stretching(median)
-show(contrast, 7)
-
-
-# In[39]:
+    median = median_filter(piece)
+    contrast = contrast_stretching(median)
+    show(contrast, 7)
 
 
-show_diff_cannies(contrast)
+    # In[39]:
 
 
-# In[41]:
+    show_diff_cannies(contrast)
 
 
-show(sobel(contrast))
+    # In[41]:
 
 
-# In[48]:
+    show(sobel(contrast))
 
 
-contrast = contrast_stretching(piece)
-show(sobel(contrast))
+    # In[48]:
 
 
-# In[7]:
+    contrast = contrast_stretching(piece)
+    show(sobel(contrast))
 
 
-show(sobel(piece))
+    # In[7]:
+
+
+    show(sobel(piece))
 

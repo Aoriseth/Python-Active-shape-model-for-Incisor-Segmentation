@@ -281,93 +281,93 @@ if __name__ == "__main__":
 # In[8]:
 
 
-fitted = np.load('fitted_tooth.npy')
-tooth = fitted[0]
-FileManager.show_tooth_points(tooth)
-
-
-# In[73]:
-
-
-def test_matching(i=0):
     fitted = np.load('fitted_tooth.npy')
-    tooth = fitted[i]
-    all_tooth_variations = landmarks[:,i]
-    pca = PCA_analysis.PCA_analysis(all_tooth_variations, None)
-    
-    b, pose_param = match_model_points(tooth, pca) 
-    x = generate_model_point(b, pca)
-    y = inv_transform(x.reshape(40,2),pose_param)
-    return tooth, y
+    tooth = fitted[0]
+    FileManager.show_tooth_points(tooth)
 
 
-# In[109]:
+    # In[73]:
 
 
-show_teeth_points()
+    def test_matching(i=0):
+        fitted = np.load('fitted_tooth.npy')
+        tooth = fitted[i]
+        all_tooth_variations = landmarks[:,i]
+        pca = PCA_analysis.PCA_analysis(all_tooth_variations, None)
+        
+        b, pose_param = match_model_points(tooth, pca) 
+        x = generate_model_point(b, pca)
+        y = inv_transform(x.reshape(40,2),pose_param)
+        return tooth, y
 
 
-# In[137]:
+    # In[109]:
 
 
-x = show_tooth_variatins(0, 1, 1/3)
-show_tooth_points(x ,False, 'orange')
-x = show_tooth_variatins(0, 1, 0)
-show_tooth_points(x ,False, 'red')
-x = show_tooth_variatins(0, 1, -1/3)
-show_tooth_points(x ,True, 'blue')
+    show_teeth_points()
 
 
-# In[139]:
+    # In[137]:
 
 
-show_tooth_variations(0, 1)
+    x = show_tooth_variatins(0, 1, 1/3)
+    show_tooth_points(x ,False, 'orange')
+    x = show_tooth_variatins(0, 1, 0)
+    show_tooth_points(x ,False, 'red')
+    x = show_tooth_variatins(0, 1, -1/3)
+    show_tooth_points(x ,True, 'blue')
 
 
-# In[140]:
+    # In[139]:
 
 
-show_tooth_variations(1, 1)
+    show_tooth_variations(0, 1)
 
 
-# In[141]:
+    # In[140]:
 
 
-show_tooth_variations(2, 1)
+    show_tooth_variations(1, 1)
 
 
-# In[143]:
+    # In[141]:
 
 
-show_tooth_variations(3, 1)
+    show_tooth_variations(2, 1)
 
 
-# In[146]:
+    # In[143]:
 
 
-show_tooth_variations(4, 1)
+    show_tooth_variations(3, 1)
 
 
-# In[24]:
+    # In[146]:
 
 
-def show_multiple_tooth_variations():
-    
-    plt.figure()
-    hn = 4
-    fig, ax = plt.subplots(figsize=(14, 4))
-
-    for i in range(4):
-        plt.subplot(1, hn, i+1)
-        plt.xticks(())
-        plt.yticks(())   
-        show_tooth_variations(i, 1, False)
-     
-    plt.show()
+    show_tooth_variations(4, 1)
 
 
-# In[25]:
+    # In[24]:
 
 
-show_multiple_tooth_variations()
+    def show_multiple_tooth_variations():
+        
+        plt.figure()
+        hn = 4
+        fig, ax = plt.subplots(figsize=(14, 4))
+
+        for i in range(4):
+            plt.subplot(1, hn, i+1)
+            plt.xticks(())
+            plt.yticks(())   
+            show_tooth_variations(i, 1, False)
+         
+        plt.show()
+
+
+    # In[25]:
+
+
+    show_multiple_tooth_variations()
 

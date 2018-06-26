@@ -275,166 +275,166 @@ if __name__ == "__main__":
     plt.show()
 
 
-# In[196]:
+    # In[196]:
 
 
-smooth = prep.gaussian_smooth1(radiograph,10)
-grad = calc_external_img2(smooth)
-grad2 = calc_external_img2(radiograph)
-fig, ax = plt.subplots(figsize=(15, 15))
-plt.imshow(grad2)
-plt.show()
-print(radiograph.dtype)
-np.histogram(grad)
-fig, ax = plt.subplots(figsize=(15, 15))
-plt.imshow(grad)
-plt.show()
+    smooth = prep.gaussian_smooth1(radiograph,10)
+    grad = calc_external_img2(smooth)
+    grad2 = calc_external_img2(radiograph)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    plt.imshow(grad2)
+    plt.show()
+    print(radiograph.dtype)
+    np.histogram(grad)
+    fig, ax = plt.subplots(figsize=(15, 15))
+    plt.imshow(grad)
+    plt.show()
 
 
-# In[185]:
+    # In[185]:
 
 
-img = radiograph
-    
-img = rgb2gray(img)
+    img = radiograph
+        
+    img = rgb2gray(img)
 
-sobelx64f = cv2.Sobel(img,cv2.CV_16S,1,0,ksize=5)
-abs_sobel64f = np.absolute(sobelx64f)
-sobelx = np.uint8(abs_sobel64f)
-plt.imshow(sobelx)
-plt.show()
+    sobelx64f = cv2.Sobel(img,cv2.CV_16S,1,0,ksize=5)
+    abs_sobel64f = np.absolute(sobelx64f)
+    sobelx = np.uint8(abs_sobel64f)
+    plt.imshow(sobelx)
+    plt.show()
 
-sobely64f = cv2.Sobel(img,cv2.CV_16S,0,1,ksize=5)
-abs_sobel64f = np.absolute(sobely64f)
-sobely = np.uint8(abs_sobel64f)
-plt.imshow(sobely64f)
-plt.show()
-
-
-# In[161]:
+    sobely64f = cv2.Sobel(img,cv2.CV_16S,0,1,ksize=5)
+    abs_sobel64f = np.absolute(sobely64f)
+    sobely = np.uint8(abs_sobel64f)
+    plt.imshow(sobely64f)
+    plt.show()
 
 
-k1 = np.array([[1,1,1],[1,1,1],[1,1,1]])/9
-smoothed = cv2.filter2D(img,-1,k1)
-
-k2 = np.array([[0,0,0],[0,2,0],[0,0,0]])
-dubbel = cv2.filter2D(img,-1,k2)
-sharp = dubbel - smoothed
-sharp2 = 2*img - smoothed
-
-plt.imshow(sharp)
-plt.show()
-plt.imshow(sharp2)
-plt.show()
-print(sharp2.dtype)
+    # In[161]:
 
 
-# In[103]:
+    k1 = np.array([[1,1,1],[1,1,1],[1,1,1]])/9
+    smoothed = cv2.filter2D(img,-1,k1)
+
+    k2 = np.array([[0,0,0],[0,2,0],[0,0,0]])
+    dubbel = cv2.filter2D(img,-1,k2)
+    sharp = dubbel - smoothed
+    sharp2 = 2*img - smoothed
+
+    plt.imshow(sharp)
+    plt.show()
+    plt.imshow(sharp2)
+    plt.show()
+    print(sharp2.dtype)
 
 
-piece = img[175:275, 225:325]
-tooth2 = tooth
-tooth2[:,0]=tooth[:,0]-225
-tooth2[:,1]=tooth[:,1]-175
-fig, ax = plt.subplots(figsize=(7, 7))
-plt.imshow(piece)
-plt.plot(tooth2[:,0], tooth2[:,1], 'ro', markersize=2)
-plt.show()
+    # In[103]:
 
 
-# In[141]:
+    piece = img[175:275, 225:325]
+    tooth2 = tooth
+    tooth2[:,0]=tooth[:,0]-225
+    tooth2[:,1]=tooth[:,1]-175
+    fig, ax = plt.subplots(figsize=(7, 7))
+    plt.imshow(piece)
+    plt.plot(tooth2[:,0], tooth2[:,1], 'ro', markersize=2)
+    plt.show()
 
 
-new_tooth = active_contour(tooth2, prep.gaussian(piece,1.5), 2, 2, 25)
-fig, ax = plt.subplots(figsize=(7, 7))
-plt.imshow(piece)
-plt.plot(new_tooth[:,0], new_tooth[:,1], 'ro', markersize=2)
-plt.show()
+    # In[141]:
 
 
-# In[137]:
+    new_tooth = active_contour(tooth2, prep.gaussian(piece,1.5), 2, 2, 25)
+    fig, ax = plt.subplots(figsize=(7, 7))
+    plt.imshow(piece)
+    plt.plot(new_tooth[:,0], new_tooth[:,1], 'ro', markersize=2)
+    plt.show()
 
 
-ext3 = calc_external_img2(piece)
-fig, ax = plt.subplots(figsize=(7, 7))
-plt.imshow(ext3)
-plt.plot(tooth2[0,0], new_tooth[0,1], 'ro', markersize=2)
-plt.show()
+    # In[137]:
 
 
-# In[87]:
+    ext3 = calc_external_img2(piece)
+    fig, ax = plt.subplots(figsize=(7, 7))
+    plt.imshow(ext3)
+    plt.plot(tooth2[0,0], new_tooth[0,1], 'ro', markersize=2)
+    plt.show()
 
 
-tooth[:,0]=tooth[:,0]-225
-tooth[:,1]=tooth[:,1]-175
+    # In[87]:
 
 
-# In[88]:
+    tooth[:,0]=tooth[:,0]-225
+    tooth[:,1]=tooth[:,1]-175
 
 
-for p in tooth:
-    print(ext3[int(p[0]),int(p[1])])
+    # In[88]:
 
 
-# In[127]:
+    for p in tooth:
+        print(ext3[int(p[0]),int(p[1])])
 
 
-mean = calc_mean(tooth)
-size = len(tooth)
-for i in range(size-1):
-    p1 = tooth[i]
-    p2 = tooth[i+1]
-    print(100*calc_internal_mean(p1,p2, mean))
-    
+    # In[127]:
 
 
-# In[124]:
+    mean = calc_mean(tooth)
+    size = len(tooth)
+    for i in range(size-1):
+        p1 = tooth[i]
+        p2 = tooth[i+1]
+        print(100*calc_internal_mean(p1,p2, mean))
+        
 
 
-mean
+    # In[124]:
 
 
-# In[92]:
+    mean
 
 
-size = len(tooth)
-for i in range(size-1):
-    p1 = tooth[i]
-    p2 = tooth[i+1]
-    print(calc_energy(p1,p2,ext3,0.5))
-    
+    # In[92]:
 
 
-# In[34]:
+    size = len(tooth)
+    for i in range(size-1):
+        p1 = tooth[i]
+        p2 = tooth[i+1]
+        print(calc_energy(p1,p2,ext3,0.5))
+        
 
 
-ext.dtype
+    # In[34]:
 
 
-# In[173]:
+    ext.dtype
 
 
-new_tooth = active_contour(tooth, img, 5, 2, 1)
-
-fig, ax = plt.subplots(figsize=(15, 15))
-plt.imshow(img)
-plt.plot(new_tooth[:,0], new_tooth[:,1], 'ro', markersize=1)
-plt.show()
+    # In[173]:
 
 
-# In[143]:
+    new_tooth = active_contour(tooth, img, 5, 2, 1)
+
+    fig, ax = plt.subplots(figsize=(15, 15))
+    plt.imshow(img)
+    plt.plot(new_tooth[:,0], new_tooth[:,1], 'ro', markersize=1)
+    plt.show()
 
 
-from skimage.color import rgb2gray
-from skimage import data
-from skimage.filters import gaussian
-from skimage.segmentation import active_contour
+    # In[143]:
 
-snake = active_contour(radiograph_pre,
-                       tooth, alpha=0.015, beta=10, gamma=0.001)
 
-fig, ax = plt.subplots(figsize=(15, 15))
-plt.imshow(img)
-plt.plot(snake[:,0], snake[:,1], 'ro', markersize=1)
-plt.show()
+    from skimage.color import rgb2gray
+    from skimage import data
+    from skimage.filters import gaussian
+    from skimage.segmentation import active_contour
+
+    snake = active_contour(radiograph_pre,
+                           tooth, alpha=0.015, beta=10, gamma=0.001)
+
+    fig, ax = plt.subplots(figsize=(15, 15))
+    plt.imshow(img)
+    plt.plot(snake[:,0], snake[:,1], 'ro', markersize=1)
+    plt.show()
 
