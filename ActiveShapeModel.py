@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[36]:
+# In[5]:
 
 
 import MatchingModelPoints as match
@@ -97,9 +97,29 @@ def show_evolution(img, points_list):
         plt.plot(landmark[:,0], landmark[:,1], 'ro',  markersize=1)
      
     plt.show()
+    
+    
+def testings():
+        
+    fig, ax = plt.subplots(figsize=(15, 15))
+    plt.imshow(radiograph)
+    plt.plot(new_points[:,0], new_points[:,1], 'ro', markersize=1)
+    plt.show()
+    
+    img = fm.load_img_piece()
+    tooth = fm.load_tooth_of_piece(4)
+    landmarks = fm.load_landmarks_std()
+    tooth_variations = landmarks[:,4]
+    edge_img, pca_tooth = preperation(img, tooth_variations)
+    fm.show_with_points(img, tooth)
+    
+    #points_array = active_shape_scale_n_times(img, tooth, pca_tooth, 15, 4, 10)
+    points_array = active_shape_n_times(edge_img, tooth, pca_tooth, 10, 20 ,9)
+    
+    show_evolution(img, points_array)
 
 
-# In[92]:
+# In[2]:
 
 
 if __name__ == "__main__":
@@ -120,55 +140,6 @@ if __name__ == "__main__":
     plt.imshow(radiograph)
     plt.plot(tooth[:,0], tooth[:,1], 'ro', markersize=1)
     plt.show()
-
-
-    # In[95]:
-
-
-    points = active_shape_n_times(edge_img, tooth, pca_tooth, 5, 10)
-
-
-    # In[102]:
-
-
-    new_points = points[1]
-
-
-    # In[103]:
-
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    plt.imshow(radiograph)
-    plt.plot(new_points[:,0], new_points[:,1], 'ro', markersize=1)
-    plt.show()
-
-
-    # In[3]:
-
-
-    img = fm.load_img_piece()
-    tooth = fm.load_tooth_of_piece(4)
-    landmarks = fm.load_landmarks_std()
-    tooth_variations = landmarks[:,4]
-    edge_img, pca_tooth = preperation(img, tooth_variations)
-    fm.show_with_points(img, tooth)
-
-
-    # In[38]:
-
-
-    #points_array = active_shape_scale_n_times(img, tooth, pca_tooth, 15, 4, 10)
-    points_array = active_shape_n_times(edge_img, tooth, pca_tooth, 10, 20 ,9)
-
-
-    # In[39]:
-
-
-    show_evolution(img, points_array)
-
-
-    # In[22]:
-
-
-    points_array[0].shape
+    
+    points = active_shape_n_times(edge_img, tooth, pca_tooth, 10, 1,1)
 
