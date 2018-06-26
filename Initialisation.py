@@ -174,6 +174,16 @@ def drawTeeth(landmarks,backdrop,tooth_size,image_center,tooth_gap,top_bottom_se
                 cv2.circle(backdrop,(x,y),1,(255,255,255),-1)
     cv2.imshow("Radiograph",backdrop)
 
+def tempShow(text="Hello World"):
+    popup = np.ones((50,330), np.uint8)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(popup,text,(10,25), font, 0.5,(240,255,255),1,cv2.LINE_AA)
+    saved = cv2.namedWindow( "Saved", cv2.WINDOW_AUTOSIZE )
+    cv2.imshow("Saved",popup)
+    cv2.waitKey(2500)
+    cv2.destroyWindow("Saved")
+
+
 def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     dir_radiographs = directory
     radiographs = FileManager.load_files(dir_radiographs)
@@ -188,9 +198,14 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     global size
     global scale
     global output
+    global currentImage
     showpopup=1
     cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 
+    tempShow("Calculating Edges + PCA...")
+    grays = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
+    edge_img, pca_teeth = asm.preperation_all(grays, all_landmarks_std)
+    tempShow("Calculating Edges + PCA : DONE!")
     
     
     loop=1
@@ -271,21 +286,62 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             segmentation = cv2.bitwise_and(grays, grays, mask=mask)
             cv2.namedWindow("Segmentation",cv2.WINDOW_AUTOSIZE)
             cv2.imshow("Segmentation", segmentation)
-        elif k == 111:
+        elif k == 92:
             grays = cv2.cvtColor(backdrop, cv2.COLOR_BGR2GRAY)
-            for i in range(3,4):
-                tooth_variations = all_landmarks_std[:,i]
-                # print(tooth_variations)
-                # print(output[:,0])
-                tooth_points = np.empty((40,2))
+            mask = np.zeros(grays.shape, np.uint8)
+            for i in range(0,8):
+                test = output[0,i,:,:].astype(np.int32)
+                cv2.fillConvexPoly(mask, test,(255,255,255))
+            segmentation = cv2.bitwise_and(grays, grays, mask=mask)
+            cv2.namedWindow("Segmentation",cv2.WINDOW_AUTOSIZE)
+            cv2.imshow("Segmentation", mask)
+        elif k == 93:
+            grays = cv2.cvtColor(backdrop, cv2.COLOR_BGR2GRAY)
+            mask = np.zeros(grays.shape, np.uint8)
+            test = output[0,0,:,:].astype(np.int32)
+            cv2.fillConvexPoly(mask, test,(255,255,255))
+            segmentation = cv2.bitwise_and(grays, grays, mask=mask)
+            mask = cv2.resize(mask, (int(size[0]/2),int(size[1]/2)))
+            retval, mask = cv2.threshold(mask, 5, 255, cv2.THRESH_BINARY)
+            cv2.namedWindow("Segmentation",cv2.WINDOW_AUTOSIZE)
+            cv2.imshow("Segmentation", mask)
+            dir_segmentations = "_Data\\Segmentations\\%02d-0.png" % currentImage
+
+            segCompare = cv2.imread(dir_segmentations, 0)
+            segCompare = cv2.resize(segCompare, (int(size[0]/2),int(size[1]/2)))
+            retval, segCompare = cv2.threshold(segCompare, 5, 255, cv2.THRESH_BINARY)
+            cv2.namedWindow("ExampleSeg",cv2.WINDOW_AUTOSIZE)
+            cv2.imshow("ExampleSeg", segCompare)
+
+            err1 = segCompare-mask
+            err2 = mask-segCompare
+            err = cv2.bitwise_or(err1, err2)
+            totalpix = cv2.bitwise_or(mask,segCompare)
+            # retval, err = cv2.threshold(err, 5, 255, cv2.THRESH_BINARY)
+            # print(np.sum(err)/np.count_nonzero(err))
+            # print(np.count_nonzero(segCompare))
+            # print(np.count_nonzero(err))
+            
+            # err = np.equal(segCompare,mask).astype(np.uint8)
+            retval, err = cv2.threshold(err, 1, 255, cv2.THRESH_BINARY)
+            print("The segmentation is %0.2f %% correct" % ((1-(np.count_nonzero(err)/np.count_nonzero(totalpix)))*100))
+            cv2.namedWindow("diff",cv2.WINDOW_AUTOSIZE)
+            cv2.imshow("diff", err)
+
+        elif k == 105:
+            tempShow("Calculating Edges + PCA...")
+            grays = cv2.cvtColor(backdrop, cv2.COLOR_BGR2GRAY)
+            edge_img, pca_teeth = asm.preperation_all(grays, all_landmarks_std)
+            tempShow("Calculating Edges + PCA : DONE!")
+        elif k == 111:
+            for i in range(0,8):
                 tooth_points = output[0,i,:,:]
-                edge_img, pca_tooth = asm.preperation(grays, tooth_variations)
-                points = asm.active_shape(edge_img, tooth_points, pca_tooth, 5,20)
+                points = asm.active_shape(edge_img, tooth_points, pca_teeth[i], 5,5)
                 # print(all_landmarks_std[0,0,:,:])
                 output[0,i,:,:] = points
-            # print(output)
             drawTeethOutput(output, backdrop)
-            print("done")
+            # print(output)
+            tempShow("ASM iteration complete!")
         elif k == 47:
             # print(output)
             np.save("initial_position", output)
