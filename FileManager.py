@@ -41,8 +41,8 @@ def load_tooth(i):
     init = np.load("initial_position.npy")
     return init[0,i,:,:]/0.3
 
-def load_tooth_of_piece():
-    tooth = load_tooth(4)
+def load_tooth_of_piece(id=4):
+    tooth = load_tooth(id)
     tooth_of_piece = tooth
     tooth_of_piece[:,0]=tooth[:,0]-1200
     tooth_of_piece[:,1]=tooth[:,1]-700

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[12]:
+# In[49]:
 
 
 import numpy as np
@@ -44,7 +44,7 @@ def calc_external_img2(img):
 
 def calc_external_img(img): 
 
-    img = np.array(img, dtype=np.uint16)
+    img = np.array(img, dtype=np.int16)
     kx = np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
     Gx = cv2.filter2D(img,-1,kx)
     
@@ -104,7 +104,10 @@ def active_contour(points, edge_img, pixel_width, alpha):
     trellis = np.zeros((size, num_states), dtype=np.float16)
     back_pointers = np.zeros((size, num_states), dtype=int)
     #external_img = calc_external_img(img)
-    external_img = -edge_img
+    if(np.dtype('bool') == edge_img.dtype):
+        external_img = -np.array(edge_img,dtype=np.int8)
+    else:
+        external_img = -edge_img 
     mean_points = calc_mean(points)
     
     #init
@@ -188,101 +191,139 @@ def get_angles_of(points):
     
 
 
-# In[37]:
+# In[2]:
 
 
 if __name__ == "__main__":
 
     piece = fm.load_img_piece()
-    tooth = fm.load_tooth_of_piece(5)
-    ext = calc_external_img(piece) 
-    fm.show_with_points(ext, tooth)
-    img, stooth = fm.resolution_scale(piece, tooth, 1/6)
-    ext = calc_external_img(img) 
-    fm.show_with_points(ext, stooth)
-
-
-    # In[36]:
-
-
-    new_tooth = active_contour(stooth, -ext2, 10, 5)
-    fm.show_with_points(ext2, new_tooth)
-
-
-    # In[4]:
-
-
-    ext = calc_external_img(piece)
-    fm.show(ext)
-
-
-    # In[ ]:
-
-
-    new_tooth = active_contour(tooth, piece, 20, 10)
-    fm.show_with_points(ext, new_tooth)
-
-
-    # In[3]:
-
-
-    new_img, new_points = resolution_scale(piece, tooth, 1/8)
-    fm.show_with_points(new_img, new_points)
-    new_tooth = active_contour_loop(new_points, new_img, 1, 10, 10)
-    fm.show_with_points(new_img, new_points)
-
-
-    # In[41]:
-
-
-    new_ext = calc_external_img(new_img) 
-    fm.show_with_points(new_ext, new_tooth)
-
-
-    # In[44]:
-
-
-    new_piece, new_tooth = resolution_scale(piece, tooth,1/10)
-
-    mean = calc_mean(new_tooth)
-    ext1 = calc_external_img(new_piece)
-    fm.show_with_points(ext1, new_tooth[0:2])
-
-    print(calc_external(new_tooth[0],ext1))
-    print(calc_internal(new_tooth[0], new_tooth[1], mean))
-    print(calc_energy(new_tooth[0],new_tooth[1],ext1,mean,10))
-
-
-
-    # In[45]:
-
-
-    new_piece, new_tooth = piece, tooth 
-
-    mean = calc_mean(new_tooth)
-    ext = calc_external_img(new_piece)
-    fm.show_with_points(ext, new_tooth[0:2])
-
-    print(calc_external(new_tooth[0],ext))
-    print(calc_internal(new_tooth[0], new_tooth[1], mean))
-    print(calc_energy(new_tooth[0],new_tooth[1],ext,mean,10))
-
-
-    # In[8]:
-
-
-    piece = fm.load_img_piece()
-    tooth = fm.load_tooth_of_piece(0)
-    ext = calc_external_img2(piece) 
+    tooth = fm.load_tooth_of_piece()
+    ext = prep.calc_external_img_active_contour(piece) 
     fm.show_with_points(ext, tooth)
     ext2, stooth = fm.resolution_scale(ext, tooth, 1/6)
-    ext = calc_external_img2(img) 
     fm.show_with_points(ext2, stooth)
 
 
-    # In[11]:
+# In[36]:
 
 
-    new_tooth = active_contour(stooth, ext2, 6, 1)
-    fm.show_with_points(ext2, new_tooth)
+new_tooth = active_contour(stooth, ext2, 10, 5)
+fm.show_with_points(ext2, new_tooth)
+
+
+# In[4]:
+
+
+ext = calc_external_img(piece)
+fm.show(ext)
+
+
+# In[ ]:
+
+
+new_tooth = active_contour(tooth, piece, 20, 10)
+fm.show_with_points(ext, new_tooth)
+
+
+# In[3]:
+
+
+new_img, new_points = resolution_scale(piece, tooth, 1/8)
+fm.show_with_points(new_img, new_points)
+new_tooth = active_contour_loop(new_points, new_img, 1, 10, 10)
+fm.show_with_points(new_img, new_points)
+
+
+# In[41]:
+
+
+new_ext = calc_external_img(new_img) 
+fm.show_with_points(new_ext, new_tooth)
+
+
+# In[44]:
+
+
+new_piece, new_tooth = resolution_scale(piece, tooth,1/10)
+
+mean = calc_mean(new_tooth)
+ext1 = calc_external_img(new_piece)
+fm.show_with_points(ext1, new_tooth[0:2])
+
+print(calc_external(new_tooth[0],ext1))
+print(calc_internal(new_tooth[0], new_tooth[1], mean))
+print(calc_energy(new_tooth[0],new_tooth[1],ext1,mean,10))
+
+
+
+# In[45]:
+
+
+new_piece, new_tooth = piece, tooth 
+
+mean = calc_mean(new_tooth)
+ext = calc_external_img(new_piece)
+fm.show_with_points(ext, new_tooth[0:2])
+
+print(calc_external(new_tooth[0],ext))
+print(calc_internal(new_tooth[0], new_tooth[1], mean))
+print(calc_energy(new_tooth[0],new_tooth[1],ext,mean,10))
+
+
+# In[8]:
+
+
+piece = fm.load_img_piece()
+tooth = fm.load_tooth_of_piece(0)
+ext = calc_external_img2(piece) 
+fm.show_with_points(ext, tooth)
+ext2, stooth = fm.resolution_scale(ext, tooth, 1/6)
+ext = calc_external_img2(img) 
+fm.show_with_points(ext2, stooth)
+
+
+# In[11]:
+
+
+new_tooth = active_contour(stooth, ext2, 6, 1)
+fm.show_with_points(ext2, new_tooth)
+
+
+# In[60]:
+
+
+piece = fm.load_img_piece()
+edge_img = prep.canny(piece)
+tooth = fm.load_tooth_of_piece(5)
+
+
+# In[9]:
+
+
+fm.show_with_points(edge_img, tooth)
+
+
+# In[51]:
+
+
+new_tooth = active_contour(tooth, edge_img, 25, 1)
+fm.show_with_points(edge_img, new_tooth)
+
+# for i in range(7):
+#     tooth = fm.load_tooth_of_piece(i+1)
+#     new_points, total_error = fit_measure(tooth, 25, edge_img)
+#     new_points_list = np.append(new_points_list,new_points)
+# fm.show_with_points(edge_img, new_points_list.reshape(-1,2))
+
+
+# In[56]:
+
+
+piece = fm.load_img_piece()
+edge_img = prep.canny(piece)
+tooth = fm.load_tooth_of_piece(2)
+fm.show_with_points(edge_img, tooth)
+
+new_tooth = active_contour(tooth, edge_img, 40, 1/2)
+fm.show_with_points(edge_img, new_tooth)
 

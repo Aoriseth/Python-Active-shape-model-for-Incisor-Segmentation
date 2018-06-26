@@ -59,7 +59,7 @@
 #     return np.dot(rotation/s, p-Txy)
 
 
-# In[1]:
+# In[11]:
 
 
 import os
@@ -193,17 +193,70 @@ def match_model_points(Y, pca):
          
         y = transform(Y,pose_param)
         
-#        y = project_to_tangent_plane(y, pca)
-#        y = y.reshape(40,2)
+        y = project_to_tangent_plane(y, pca)
+        y = y.reshape(40,2)
 
         b = update_model_param(y, pca)
         b = constraint_model_param(b,pca)
 
     return best_b, best_pose_param;
+
+def show_tooth_points(landmark, show=True, color = 'red'):
+    plt.plot(landmark[:,0], landmark[:,1], 'ro',color=color)
+    
+    if show:
+        plt.show()
         
+def show_matching_of_teeth():
+    
+    plt.figure()
+    hn = 4
+    fig, ax = plt.subplots(figsize=(15, 7))
+
+    for i in range(8):
+        tooth, y = test_matching(i)
+        plt.subplot(2, hn, i+1)
+        plt.xticks(())
+        plt.yticks(())   
+        show_tooth_points(y, False, 'blue')
+        show_tooth_points(tooth, False, 'orange')
+     
+    plt.show()
+    
+def plot_eigenvalues():
+    all_tooth_variations = landmarks[:,0]
+    pca = PCA_analysis.PCA_analysis(all_tooth_variations, None)
+    eigenvalues = PCA_analysis.get_eigenvalues(pca)
+    x = np.zeros(14)
+    for i in range(14):
+        x[i] = eigenvalues[i]
+    plt.plot(range(14), x)
+    plt.title('Influence of eigenvalues')
+    plt.xlabel('n-th principal component')
+    plt.ylabel('Eigenvalue')
+    plt.show()
+    
+def show_tooth_variatins(toothID, pcaID, size):
+    landmarks = FileManager.load_landmarks_std()
+    all_tooth_variations = landmarks[:,toothID]
+    pca = PCA_analysis.PCA_analysis(all_tooth_variations, None)
+    b = np.zeros(14)
+    pca1 = get_range_of(pcaID, pca)
+    b[pcaID] = pca1*size
+    x = generate_model_point(b, pca)
+    return x.reshape(40,2)
+
+    
+def show_tooth_variations(pcaID, size, show=True):
+    x = show_tooth_variatins(0, pcaID, size)
+    show_tooth_points(x ,False, 'orange')
+    x = show_tooth_variatins(0, pcaID, 0)
+    show_tooth_points(x ,False, 'red')
+    x = show_tooth_variatins(0, pcaID, -size)
+    show_tooth_points(x ,show, 'blue')
 
 
-# In[2]:
+# In[3]:
 
 
 if __name__ == "__main__":
@@ -223,4 +276,98 @@ if __name__ == "__main__":
     FileManager.show_tooth_points(y)
     
 # print(tooth - y)
+
+
+# In[8]:
+
+
+fitted = np.load('fitted_tooth.npy')
+tooth = fitted[0]
+FileManager.show_tooth_points(tooth)
+
+
+# In[73]:
+
+
+def test_matching(i=0):
+    fitted = np.load('fitted_tooth.npy')
+    tooth = fitted[i]
+    all_tooth_variations = landmarks[:,i]
+    pca = PCA_analysis.PCA_analysis(all_tooth_variations, None)
+    
+    b, pose_param = match_model_points(tooth, pca) 
+    x = generate_model_point(b, pca)
+    y = inv_transform(x.reshape(40,2),pose_param)
+    return tooth, y
+
+
+# In[109]:
+
+
+show_teeth_points()
+
+
+# In[137]:
+
+
+x = show_tooth_variatins(0, 1, 1/3)
+show_tooth_points(x ,False, 'orange')
+x = show_tooth_variatins(0, 1, 0)
+show_tooth_points(x ,False, 'red')
+x = show_tooth_variatins(0, 1, -1/3)
+show_tooth_points(x ,True, 'blue')
+
+
+# In[139]:
+
+
+show_tooth_variations(0, 1)
+
+
+# In[140]:
+
+
+show_tooth_variations(1, 1)
+
+
+# In[141]:
+
+
+show_tooth_variations(2, 1)
+
+
+# In[143]:
+
+
+show_tooth_variations(3, 1)
+
+
+# In[146]:
+
+
+show_tooth_variations(4, 1)
+
+
+# In[24]:
+
+
+def show_multiple_tooth_variations():
+    
+    plt.figure()
+    hn = 4
+    fig, ax = plt.subplots(figsize=(14, 4))
+
+    for i in range(4):
+        plt.subplot(1, hn, i+1)
+        plt.xticks(())
+        plt.yticks(())   
+        show_tooth_variations(i, 1, False)
+     
+    plt.show()
+
+
+# In[25]:
+
+
+show_multiple_tooth_variations()
 

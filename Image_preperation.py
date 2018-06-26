@@ -7,7 +7,6 @@
 import cv2
 import numpy as np
 import math
-import matplotlib
 from scipy import ndimage, signal
 import matplotlib.pyplot as plt
 import matplotlib
@@ -18,7 +17,6 @@ from scipy import ndimage
 
 from skimage.util.dtype import dtype_range
 from skimage.util import img_as_ubyte
-from skimage.util import img_as_float
 from skimage.morphology import disk
 from skimage.filters import rank
 from skimage import exposure
@@ -310,38 +308,38 @@ if __name__ == "__main__":
     show_diff_edge_detectors(contrast)
 
 
-    # In[27]:
+# In[27]:
 
 
-    new_img = adaptive_equalization(piece)
-    show(new_img, 7)
+new_img = adaptive_equalization(piece)
+show(new_img, 7)
 
-    median = median_filter(piece)
-    contrast = contrast_stretching(median)
-    show(contrast, 7)
-
-
-    # In[39]:
+median = median_filter(piece)
+contrast = contrast_stretching(median)
+show(contrast, 7)
 
 
-    show_diff_cannies(contrast)
+# In[39]:
 
 
-    # In[41]:
+show_diff_cannies(contrast)
 
 
-    show(sobel(contrast))
+# In[41]:
 
 
-    # In[48]:
+show(sobel(contrast))
 
 
-    contrast = contrast_stretching(piece)
-    show(sobel(contrast))
+# In[48]:
 
 
-    # In[7]:
+contrast = contrast_stretching(piece)
+show(sobel(contrast))
 
 
-    show(sobel(piece))
+# In[7]:
+
+
+show(sobel(piece))
 
