@@ -244,6 +244,23 @@ def test_normal_on_edge():
     plt.plot(np.arange(-20,21),strength)
     plt.show()
     
+    
+def show_results_fitting():
+    piece = fm.load_img_piece()
+    edge_img = prep.canny(piece)
+    tooth = fm.load_tooth_of_piece(0)
+    new_points_list, total_error = fit_measure(tooth, 30, edge_img)
+    for i in range(7):
+        tooth = fm.load_tooth_of_piece(i+1)
+        new_points, total_error = fit_measure(tooth, 25, edge_img)
+        new_points_list = np.append(new_points_list,new_points)
+    fm.show_with_points(edge_img, new_points_list.reshape(-1,2))
+
+#     new_points_list = fm.load_tooth_of_piece(0)
+#     for i in range(7):
+#         new_points = fm.load_tooth_of_piece(i+1)
+#         new_points_list = np.append(new_points_list,new_points)
+#     fm.show_with_points(edge_img, new_points_list.reshape(-1,2))
 
 
 # In[2]:
@@ -312,58 +329,4 @@ if __name__ == "__main__":
     
 #     new_points, error = fit_measure(tooth, 30, edge_img)
 #     fm.show_with_points(piece, new_points)
-
-
-    # In[3]:
-
-
-    piece = fm.load_img_piece()
-    tooth = fm.load_tooth_of_piece(2)
-    edge_img = prep.canny(piece)
-    new_points, total_error = fit_measure(tooth, 20, edge_img)
-    fm.show_with_points(edge_img, new_points)
-
-
-    # In[4]:
-
-
-    tooth = fm.load_tooth_of_piece(2)
-    fm.show_with_points(edge_img, tooth)
-
-
-    # In[3]:
-
-
-    piece = fm.load_img_piece()
-    edge_img = prep.canny(piece)
-    tooth = fm.load_tooth_of_piece(0)
-    new_points_list, total_error = fit_measure(tooth, 30, edge_img)
-    for i in range(7):
-        tooth = fm.load_tooth_of_piece(i+1)
-        new_points, total_error = fit_measure(tooth, 25, edge_img)
-        new_points_list = np.append(new_points_list,new_points)
-    fm.show_with_points(edge_img, new_points_list.reshape(-1,2))
-
-
-    # In[4]:
-
-
-    new_points_list = new_points_list.reshape(-1,40,2)
-    new_points_list.shape
-
-
-    # In[19]:
-
-
-    np.save('fitted_tooth', new_points_list)
-
-
-    # In[12]:
-
-
-    new_points_list = fm.load_tooth_of_piece(0)
-    for i in range(7):
-        new_points = fm.load_tooth_of_piece(i+1)
-        new_points_list = np.append(new_points_list,new_points)
-    fm.show_with_points(edge_img, new_points_list.reshape(-1,2))
 

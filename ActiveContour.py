@@ -1,20 +1,18 @@
 
 # coding: utf-8
 
-# In[159]:
+# In[5]:
 
 
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.color import rgb2gray
 from skimage.filters import gaussian
-import ActiveShapeModel 
 import scipy
 import cv2
 from scipy import ndimage
 import Image_preperation as prep
 import FileManager as fm
-import Image_preperation as prep
 
 def calc_internal(p1,p2):
     if (np.array_equal(p1,p2)):
@@ -41,19 +39,19 @@ def calc_mean(points):
         
     return mean_sum / size
 
-def calc_external_img(img):
+# def calc_external_img(img):
     
-    img = rgb2gray(img)
+#     img = rgb2gray(img)
     
-    sobelx64f = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
-    abs_sobel64f = np.absolute(sobelx64f)
-    sobelx = np.uint8(abs_sobel64f)
+#     sobelx64f = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=5)
+#     abs_sobel64f = np.absolute(sobelx64f)
+#     sobelx = np.uint8(abs_sobel64f)
     
-    sobely64f = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=5)
-    abs_sobel64f = np.absolute(sobely64f)
-    sobely = np.uint8(abs_sobel64f)
+#     sobely64f = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=5)
+#     abs_sobel64f = np.absolute(sobely64f)
+#     sobely = np.uint8(abs_sobel64f)
 
-    return -(sobelx + sobely)
+#     return -(sobelx + sobely)
 
 def calc_external_img2(img): 
 
@@ -101,7 +99,7 @@ def calc_energy3(p1, p2, mean, external_img, alpha):
     internal = calc_internal_mean(p1,p2, mean)
     external = calc_external(p2, external_img)
     
-    return alpha * internal + external
+    return internal + alpha * external
 
 
 
@@ -154,8 +152,8 @@ def viterbi(points, img, pixel_width, alpha):
             for d in range(num_states):
                 p1 = get_point_state(points[i-1], d, pixel_width)
                 p2 = get_point_state(points[i],t, pixel_width)
-                #energy_trans = calc_energy(p1, p2, external_img, alpha)
-                energy_trans = calc_energy3(p1, p2, mean, external_img, alpha)
+                energy_trans = calc_energy(p1, p2, external_img, alpha)
+#                 energy_trans = calc_energy3(p1, p2, mean, external_img, alpha)
 
                 tmp = trellis[i-1,d] + energy_trans
 
@@ -251,12 +249,7 @@ def resolution_downscale(img, resize):
 
     return cv2.resize(img, (yn ,xn)) 
 
-
-# In[169]:
-
-
-if __name__ == "__main__":
-
+def previous_test():
     dir_radiographs = "_Data\Radiographs\*.tif"
     radiographs = fm.load_files(dir_radiographs)
     radiograph = radiographs[0]
@@ -266,7 +259,7 @@ if __name__ == "__main__":
     tooth = init[0,4,:,:]/0.3
     #tooth = tooth/down_sample
 
-    radiograph_pre = prep.pre_processing(radiograph)
+    radiograph_pre = pre_processing(radiograph)
     img = resolution_downscale(radiograph_pre,down_sample)
 
     fig, ax = plt.subplots(figsize=(15, 15))
@@ -274,167 +267,24 @@ if __name__ == "__main__":
     plt.plot(tooth[:,0], tooth[:,1], 'ro', markersize=1)
     plt.show()
 
-
-    # In[196]:
-
-
-    smooth = prep.gaussian_smooth1(radiograph,10)
-    grad = calc_external_img2(smooth)
-    grad2 = calc_external_img2(radiograph)
-    fig, ax = plt.subplots(figsize=(15, 15))
-    plt.imshow(grad2)
-    plt.show()
-    print(radiograph.dtype)
-    np.histogram(grad)
-    fig, ax = plt.subplots(figsize=(15, 15))
-    plt.imshow(grad)
-    plt.show()
+def test_module():
+    piece = fm.load_img_piece()
+    tooth = fm.load_tooth_of_piece(0)
+    ext = calc_external_img2(piece) 
+    fm.show_with_points(ext, tooth)
+    
+    img, stooth = fm.resolution_scale(piece, tooth, 1/6)
+    ext = calc_external_img2(img) 
+    fm.show_with_points(ext, stooth)
+    
+    new_tooth = active_contour(stooth, img, 1, 3, 1)
+    fm.show_with_points(ext, new_tooth)
 
 
-    # In[185]:
+# In[6]:
 
 
-    img = radiograph
-        
-    img = rgb2gray(img)
+if __name__ == "__main__":
 
-    sobelx64f = cv2.Sobel(img,cv2.CV_16S,1,0,ksize=5)
-    abs_sobel64f = np.absolute(sobelx64f)
-    sobelx = np.uint8(abs_sobel64f)
-    plt.imshow(sobelx)
-    plt.show()
-
-    sobely64f = cv2.Sobel(img,cv2.CV_16S,0,1,ksize=5)
-    abs_sobel64f = np.absolute(sobely64f)
-    sobely = np.uint8(abs_sobel64f)
-    plt.imshow(sobely64f)
-    plt.show()
-
-
-    # In[161]:
-
-
-    k1 = np.array([[1,1,1],[1,1,1],[1,1,1]])/9
-    smoothed = cv2.filter2D(img,-1,k1)
-
-    k2 = np.array([[0,0,0],[0,2,0],[0,0,0]])
-    dubbel = cv2.filter2D(img,-1,k2)
-    sharp = dubbel - smoothed
-    sharp2 = 2*img - smoothed
-
-    plt.imshow(sharp)
-    plt.show()
-    plt.imshow(sharp2)
-    plt.show()
-    print(sharp2.dtype)
-
-
-    # In[103]:
-
-
-    piece = img[175:275, 225:325]
-    tooth2 = tooth
-    tooth2[:,0]=tooth[:,0]-225
-    tooth2[:,1]=tooth[:,1]-175
-    fig, ax = plt.subplots(figsize=(7, 7))
-    plt.imshow(piece)
-    plt.plot(tooth2[:,0], tooth2[:,1], 'ro', markersize=2)
-    plt.show()
-
-
-    # In[141]:
-
-
-    new_tooth = active_contour(tooth2, prep.gaussian(piece,1.5), 2, 2, 25)
-    fig, ax = plt.subplots(figsize=(7, 7))
-    plt.imshow(piece)
-    plt.plot(new_tooth[:,0], new_tooth[:,1], 'ro', markersize=2)
-    plt.show()
-
-
-    # In[137]:
-
-
-    ext3 = calc_external_img2(piece)
-    fig, ax = plt.subplots(figsize=(7, 7))
-    plt.imshow(ext3)
-    plt.plot(tooth2[0,0], new_tooth[0,1], 'ro', markersize=2)
-    plt.show()
-
-
-    # In[87]:
-
-
-    tooth[:,0]=tooth[:,0]-225
-    tooth[:,1]=tooth[:,1]-175
-
-
-    # In[88]:
-
-
-    for p in tooth:
-        print(ext3[int(p[0]),int(p[1])])
-
-
-    # In[127]:
-
-
-    mean = calc_mean(tooth)
-    size = len(tooth)
-    for i in range(size-1):
-        p1 = tooth[i]
-        p2 = tooth[i+1]
-        print(100*calc_internal_mean(p1,p2, mean))
-        
-
-
-    # In[124]:
-
-
-    mean
-
-
-    # In[92]:
-
-
-    size = len(tooth)
-    for i in range(size-1):
-        p1 = tooth[i]
-        p2 = tooth[i+1]
-        print(calc_energy(p1,p2,ext3,0.5))
-        
-
-
-    # In[34]:
-
-
-    ext.dtype
-
-
-    # In[173]:
-
-
-    new_tooth = active_contour(tooth, img, 5, 2, 1)
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    plt.imshow(img)
-    plt.plot(new_tooth[:,0], new_tooth[:,1], 'ro', markersize=1)
-    plt.show()
-
-
-    # In[143]:
-
-
-    from skimage.color import rgb2gray
-    from skimage import data
-    from skimage.filters import gaussian
-    from skimage.segmentation import active_contour
-
-    snake = active_contour(radiograph_pre,
-                           tooth, alpha=0.015, beta=10, gamma=0.001)
-
-    fig, ax = plt.subplots(figsize=(15, 15))
-    plt.imshow(img)
-    plt.plot(snake[:,0], snake[:,1], 'ro', markersize=1)
-    plt.show()
+    test_module()
 
