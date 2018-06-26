@@ -307,39 +307,12 @@ if __name__ == "__main__":
     
     show_diff_edge_detectors(contrast)
 
-
-# In[27]:
-
-
-    new_img = adaptive_equalization(piece)
-    show(new_img, 7)
-
-    median = median_filter(piece)
-    contrast = contrast_stretching(median)
-    show(contrast, 7)
-
-
-    # In[39]:
-
-
+    
     show_diff_cannies(contrast)
 
 
-    # In[41]:
+# In[39]:
 
 
-    show(sobel(contrast))
 
-
-    # In[48]:
-
-
-    contrast = contrast_stretching(piece)
-    show(sobel(contrast))
-
-
-    # In[7]:
-
-
-    show(sobel(piece))
 
