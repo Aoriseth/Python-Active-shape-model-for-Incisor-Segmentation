@@ -249,7 +249,7 @@ def show_results_fitting():
     piece = fm.load_img_piece()
     edge_img = prep.canny(piece)
     tooth = fm.load_tooth_of_piece(0)
-    new_points_list, total_error = fit_measure(tooth, 30, edge_img)
+    new_points_list, total_error = fit_measure(tooth, 25, edge_img)
     for i in range(7):
         tooth = fm.load_tooth_of_piece(i+1)
         new_points, total_error = fit_measure(tooth, 25, edge_img)
@@ -311,6 +311,7 @@ if __name__ == "__main__":
     
     p = strongest_edge_point_on_normal(a,b,c,20, edge_img)
     show_with_points(edge_img,np.append(visualize_points,p).reshape(-1,2))
+    show_results_fitting()
     
 #     piece = prep.median_filter(piece)
 #     edge_img = prep.edge_detection_high(piece)

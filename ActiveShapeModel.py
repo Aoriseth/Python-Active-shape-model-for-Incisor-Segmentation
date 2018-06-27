@@ -40,6 +40,7 @@ def active_shape_scale(img, tooth_points, pca_tooth, length, scale):
 
 def active_shape(edge_img, tooth_points, pca_tooth, length, alfa, activeFitON, MatchingON=True):
 
+<<<<<<< HEAD
     if(activeFitON):
         new_points = af.active_contour(tooth_points, edge_img, length, alfa)
     else:
@@ -53,6 +54,14 @@ def active_shape(edge_img, tooth_points, pca_tooth, length, alfa, activeFitON, M
         y = new_points
         
     return y
+=======
+    new_points, error = fit.fit_measure(tooth_points, length, edge_img)
+    # new_points = af.active_contour(tooth_points, edge_img, length, alfa)
+    b, pose_param = match.match_model_points(new_points, pca_tooth)
+
+    x = match.generate_model_point(b, pca_tooth)
+    return match.inv_transform(x.reshape(40,2),pose_param)
+>>>>>>> 9a9ab79babd5afacb4cce519e68d518d3fe242c9
 
 def active_shape_n_times(edge_img, tooth_points, pca_tooth, length,alfa, n_times):
     
@@ -65,12 +74,11 @@ def active_shape_n_times(edge_img, tooth_points, pca_tooth, length,alfa, n_times
     return points
 
 
-def preperation_all(radiograph, all_landmarks):
+def preperation_all(radiograph, all_landmarks,scale):
     
     #median = prep.median_filter(radiograph)
 #     edge_img = prep.edge_detection_low(median)
-
-    edge_img = prep.calc_external_img_active_contour(radiograph)
+    edge_img = prep.calc_external_img_active_contour(radiograph,scale)
     pcas_tooth = PCA.PCA_analysis_all(all_landmarks, None)
     
     return edge_img, pcas_tooth
