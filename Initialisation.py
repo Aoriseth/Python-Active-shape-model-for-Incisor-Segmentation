@@ -205,9 +205,10 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 
     tempShow("Calculating Edges + PCA...")
-    # global img
+    global img
     grays = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
-    edge_img, pca_teeth = asm.preperation_all(grays, all_landmarks_std,scale)
+    edge_img, pca_teeth = asm.preperation_all(grays, all_landmarks_std)
+    edge_img = cv2.resize(edge_img.astype(np.uint8),size)
     tempShow("Calculating Edges + PCA : DONE!")
     
     
@@ -339,6 +340,7 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
         elif k == 111:
             for i in range(0,8):
                 tooth_points = output[0,i,:,:]
+
                 points = asm.active_shape(edge_img, tooth_points, pca_teeth[i], distance,alpha)
                 # print(all_landmarks_std[0,0,:,:])
                 output[0,i,:,:] = points

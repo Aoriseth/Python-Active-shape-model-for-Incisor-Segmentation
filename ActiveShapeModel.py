@@ -57,11 +57,11 @@ def active_shape_n_times(edge_img, tooth_points, pca_tooth, length,alfa, n_times
     return points
 
 
-def preperation_all(radiograph, all_landmarks,scale):
+def preperation_all(radiograph, all_landmarks):
     
     #median = prep.median_filter(radiograph)
 #     edge_img = prep.edge_detection_low(median)
-    edge_img = prep.calc_external_img_active_contour(radiograph,scale)
+    edge_img = prep.calc_external_img_active_contour(radiograph)
     pcas_tooth = PCA.PCA_analysis_all(all_landmarks, None)
     
     return edge_img, pcas_tooth

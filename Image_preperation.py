@@ -83,7 +83,7 @@ def local_equalization(img, size = 50):
     selem = disk(size)
     return rank.equalize(img, selem=selem)
 
-def median_filter(img, size = 9):
+def median_filter(img, size = 3):
     return scipy.signal.medfilt(img, size).astype(np.uint8)
 
 def edge_detection_low(img):
@@ -97,7 +97,7 @@ def edge_detection_high(img):
      return canny(img)
 
 def canny(img):
-    return feature.canny(img, sigma=0.1)
+    return feature.canny(img, sigma=2)
 
 def calc_external_img(img):
     
