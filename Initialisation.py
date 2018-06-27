@@ -183,7 +183,6 @@ def tempShow(text="Hello World"):
     cv2.waitKey(2500)
     cv2.destroyWindow("Saved")
 
-
 def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     dir_radiographs = directory
     radiographs = FileManager.load_files(dir_radiographs)
@@ -199,12 +198,16 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     global scale
     global output
     global currentImage
+    
+    alpha = 1.0 
+    distance = 10
     showpopup=1
     cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 
     tempShow("Calculating Edges + PCA...")
+    # global img
     grays = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
-    edge_img, pca_teeth = asm.preperation_all(grays, all_landmarks_std)
+    edge_img, pca_teeth = asm.preperation_all(grays, all_landmarks_std,scale)
     tempShow("Calculating Edges + PCA : DONE!")
     
     
@@ -336,12 +339,12 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
         elif k == 111:
             for i in range(0,8):
                 tooth_points = output[0,i,:,:]
-                points = asm.active_shape(edge_img, tooth_points, pca_teeth[i], 20,1)
+                points = asm.active_shape(edge_img, tooth_points, pca_teeth[i], distance,alpha)
                 # print(all_landmarks_std[0,0,:,:])
                 output[0,i,:,:] = points
             drawTeethOutput(output, backdrop)
             # print(output)
-            tempShow("ASM iteration complete!")
+            # tempShow("ASM iteration complete!")
         elif k == 47:
             # print(output)
             np.save("initial_position", output)
@@ -352,6 +355,23 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             cv2.imshow("Saved",popup)
             cv2.waitKey(1000)
             cv2.destroyWindow("Saved")
+        elif k == 120:
+            alpha += 0.5
+            print("alpha value = " + str(alpha))
+        elif k == 122:
+            alpha -= 0.5
+            print("alpha value = " + str(alpha))
+        elif k == 114:
+            distance += 1
+            print("pixel distance to check = " + str(distance))
+        elif k == 97:
+            distance -= 1
+            print("pixel distance to check = " + str(distance))
+        elif k == 102:
+            cv2.namedWindow("Edge image",cv2.WINDOW_AUTOSIZE)
+            cv2.imshow("Edge image", edge_img.astype(np.uint8)*255)
+
+
 
 
 
