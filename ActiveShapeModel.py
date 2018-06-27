@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[5]:
+# In[46]:
 
 
 import MatchingModelPoints as match
@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import Image_preperation as prep
 import PCA_analysis as PCA
 import ActiveFitContour as af
+import time
 
 def active_shape_scale_n_times(img, tooth_points, pca_tooth, length, scale, n_times):
     
@@ -37,14 +38,22 @@ def active_shape_scale(img, tooth_points, pca_tooth, length, scale):
     
     return new_scaled_points
 
-def active_shape(edge_img, tooth_points, pca_tooth, length, alfa):
+def active_shape(edge_img, tooth_points, pca_tooth, length, alfa, activeFitON, MatchingON=True):
 
-    new_points, error = fit.fit_measure(tooth_points, length, edge_img)
-    # new_points = af.active_contour(tooth_points, edge_img, length, alfa)
-    b, pose_param = match.match_model_points(new_points, pca_tooth)
+    if(activeFitON):
+        new_points = af.active_contour(tooth_points, edge_img, length, alfa)
+    else:
+        new_points, error = fit.fit_measure(tooth_points, length, edge_img)     
+    
+    if(MatchingON):
+        b, pose_param = match.match_model_points(new_points, pca_tooth)
+        x = match.generate_model_point(b, pca_tooth)
+        y = match.inv_transform(x.reshape(40,2),pose_param)
+    else:
+        y = new_points
+        
+    return y
 
-    x = match.generate_model_point(b, pca_tooth)
-    return match.inv_transform(x.reshape(40,2),pose_param)
 
 def active_shape_n_times(edge_img, tooth_points, pca_tooth, length,alfa, n_times):
     
@@ -116,6 +125,13 @@ def testings():
     points_array = active_shape_n_times(edge_img, tooth, pca_tooth, 10, 20 ,9)
     
     show_evolution(img, points_array)
+    
+    
+def show_with_points(img, points):
+    fig, ax = plt.subplots(figsize=(15, 15))
+    plt.imshow(img)
+    plt.plot(points[:,0], points[:,1], 'ro', markersize=1)
+    plt.show()
 
 
 # In[2]:
@@ -140,5 +156,9 @@ if __name__ == "__main__":
     plt.plot(tooth[:,0], tooth[:,1], 'ro', markersize=1)
     plt.show()
     
-    points = active_shape_n_times(edge_img, tooth, pca_tooth, 10, 1,1)
+    points_list = active_shape_n_times(edge_img, tooth, pca_tooth, 10, 1,1)
+
+    #show_evolution(radiograph,points_list)
+    for points in points_list:
+        show_with_points(radiograph, points)
 
