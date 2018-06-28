@@ -189,6 +189,10 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     global all_landmarks_std
     all_landmarks = FileManager.load_landmarks()
     all_landmarks_std = FileManager.total_procrustes_analysis(all_landmarks)
+    test = np.mean(all_landmarks_std,axis=0)
+    test = test.reshape(1,8,40,2)
+    all_landmarks_std = test
+
     global pasted
     global tooth_size
     global image_center
@@ -199,8 +203,11 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
     global output
     global currentImage
     
+    contourEnabled = False
+    matchingEnabled = True
+
     alpha = 1.0 
-    distance = 10
+    distance = 3 
     showpopup=1
     cv2.setMouseCallback('Radiograph',moveTeeth,(resized_image,all_landmarks_std))
 
@@ -341,7 +348,7 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
             for i in range(0,8):
                 tooth_points = output[0,i,:,:]
 
-                points = asm.active_shape(edge_img, tooth_points, pca_teeth[i], distance,alpha)
+                points = asm.active_shape(edge_img, tooth_points, pca_teeth[i], distance,alpha,contourEnabled,matchingEnabled)
                 # print(all_landmarks_std[0,0,:,:])
                 output[0,i,:,:] = points
             drawTeethOutput(output, backdrop)
@@ -372,6 +379,18 @@ def InitializeASM(directory = "_Data\\Radiographs\\*.tif"):
         elif k == 102:
             cv2.namedWindow("Edge image",cv2.WINDOW_AUTOSIZE)
             cv2.imshow("Edge image", edge_img.astype(np.uint8)*255)
+        elif k == 113:
+            contourEnabled = not contourEnabled
+            if(contourEnabled):
+            	print("contourEnabled=True: Using fitContour for fitting +++")
+            else:
+            	print("contourEnabled=False: Using fitFunction for fitting ---")
+        elif k == 119:
+            matchingEnabled = not matchingEnabled
+            if(matchingEnabled):
+            	print("matchingEnabled=True: Adjusting fitting to model +++")
+            else:
+            	print("matchingEnabled=False: Not adjusting fitting ---")
 
 
 
